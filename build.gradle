@@ -1,0 +1,35 @@
+apply plugin: 'java'
+
+apply plugin: 'application'
+
+mainClassName = 'oram.Main'
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src'
+        }
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile "org.apache.logging.log4j:log4j-api:2.11.2",
+            "org.apache.logging.log4j:log4j-core:2.11.2"
+    testCompile "junit:junit:4.11",
+                "org.hamcrest:hamcrest:2.1"
+}
+
+
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+jar {
+    baseName = 'gs-gradle'
+    version = '0.1.0'
+}
