@@ -11,7 +11,6 @@ import javax.crypto.SecretKey;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,8 +29,12 @@ public class LookaheadSetup {
         int numberOfFiles = Integer.parseInt(args[0]);
 
         List<BlockLookahead> blocks = new ArrayList<>();
-        for (int i = 0; i < numberOfFiles; i++)
+        for (int i = 0; i < numberOfFiles; i++) {
             blocks.add(getLookaheadDummyBlock());
+            double percent = ((double) (i + 1) / numberOfFiles) * 100;
+            if (percent % 1 == 0)
+                System.out.println("Done with " + percent + "% of the files");
+        }
 
 //        int matrixHeight = 6;
 //        for (int i = 0; i < matrixHeight; i++) {
@@ -80,11 +83,11 @@ public class LookaheadSetup {
             byte[] encryptedAddress = encryptionStrategy.encrypt(addressBytes, secretKey);
             byte[] encryptedData = encryptionStrategy.encrypt(block.getData(), secretKey);
 
-            System.out.println("Encrypt block");
-            System.out.println("    Row bytes: " + rowIndexBytes.length + ", " + Arrays.toString(rowIndexBytes));
-            System.out.println("    Col bytes: " + colIndexBytes.length + ", " + Arrays.toString(colIndexBytes));
-            System.out.println("    Add bytes: " + addressBytes.length + ", " + Arrays.toString(addressBytes));
-            System.out.println("    Dat bytes: " + block.getData().length + ", " + Arrays.toString(block.getData()));
+//            System.out.println("Encrypt block");
+//            System.out.println("    Row bytes: " + rowIndexBytes.length + ", " + Arrays.toString(rowIndexBytes));
+//            System.out.println("    Col bytes: " + colIndexBytes.length + ", " + Arrays.toString(colIndexBytes));
+//            System.out.println("    Add bytes: " + addressBytes.length + ", " + Arrays.toString(addressBytes));
+//            System.out.println("    Dat bytes: " + block.getData().length + ", " + Arrays.toString(block.getData()));
 
             byte[] indexBytes = new byte[rowIndexBytes.length + colIndexBytes.length];
             System.arraycopy(rowIndexBytes, 0, indexBytes, 0, rowIndexBytes.length);
@@ -105,10 +108,10 @@ public class LookaheadSetup {
 
 //            byte[] encryptedDataPlus = ArrayUtils.addAll(encryptedData, encryptedIndex);
 
-            System.out.println("    Ind bytes: " + indexBytes.length + ", " + Arrays.toString(indexBytes));
-            System.out.println("    Enc ind bytes: " + encryptedIndex.length + ", " + Arrays.toString(encryptedIndex));
-            System.out.println("    Enc dat bytes: " + encryptedData.length + ", " + Arrays.toString(encryptedData));
-            System.out.println("    Enc da+ bytes: " + encryptedDataPlus.length + ", " + Arrays.toString(encryptedDataPlus));
+//            System.out.println("    Ind bytes: " + indexBytes.length + ", " + Arrays.toString(indexBytes));
+//            System.out.println("    Enc ind bytes: " + encryptedIndex.length + ", " + Arrays.toString(encryptedIndex));
+//            System.out.println("    Enc dat bytes: " + encryptedData.length + ", " + Arrays.toString(encryptedData));
+//            System.out.println("    Enc da+ bytes: " + encryptedDataPlus.length + ", " + Arrays.toString(encryptedDataPlus));
 
             res.add(new BlockEncrypted(encryptedAddress, encryptedDataPlus));
         }
@@ -127,7 +130,7 @@ public class LookaheadSetup {
         return true;
     }
 
-   private static int getFlatArrayIndex(Index index, int matrixHeight) {
+    private static int getFlatArrayIndex(Index index, int matrixHeight) {
         int res = index.getRowIndex();
         res += index.getColIndex() * matrixHeight;
         return res;
