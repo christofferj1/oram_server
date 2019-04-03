@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
@@ -16,7 +17,17 @@ import java.util.Arrays;
 public class Util {
     private static final Logger logger = LogManager.getLogger("log");
 
-//        TODO: Needs testing. All numbers from 0 to like 100.
+    public static byte[] getRandomByteArray(int length) {
+        if (length <= 0) return new byte[0];
+
+        SecureRandom random = new SecureRandom();
+        byte[] res = new byte[length];
+        random.nextBytes(res);
+
+        return res;
+    }
+
+    //        TODO: Needs testing. All numbers from 0 to like 100.
     public static int byteArrayToLeInt(byte[] b) {
         final ByteBuffer bb = ByteBuffer.wrap(b);
         bb.order(ByteOrder.LITTLE_ENDIAN);

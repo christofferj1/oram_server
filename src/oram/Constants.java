@@ -9,5 +9,9 @@ package oram;
 public class Constants {
     public static final int PORT = 59595;
 
+    public static final byte[] KEY_BYTES = "$ Hello World! $".getBytes();
+
     public static final int BLOCK_SIZE = 16;
+    public static final int AES_KEY_SIZE = 16;
+    public static final int AES_BLOCK_SIZE = 16;
 }
