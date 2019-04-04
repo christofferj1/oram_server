@@ -46,7 +46,7 @@ public class ServerCommunicationLayer {
             List<String> addresses = accessEvent.getAddresses();
 
             logger.info("Received access event of type: " + operationType + ", to addresses: " +
-                    (operationType.equals(OperationType.END) ? Arrays.toString(addresses.toArray()) : null));
+                    (operationType.equals(OperationType.END) ? null : Arrays.toString(addresses.toArray())));
 
             switch (operationType) {
                 case READ: { // Handle a read event
