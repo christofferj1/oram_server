@@ -119,7 +119,8 @@ public class LookaheadSetup {
     }
 
     private static boolean writeFile(byte[] bytesForFile, String fileName) {
-        fileName = "C:\\Users\\csj\\Documents\\git\\oram2\\files\\" + fileName;
+        fileName = System.getProperty("user.dir") + "/files/" + fileName;
+	//	fileName = System.getProperty("user.home") + "/files/" + fileName;
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
             fos.write(bytesForFile);
         } catch (IOException e) {
