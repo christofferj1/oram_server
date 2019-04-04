@@ -37,6 +37,7 @@ public class ServerCommunicationLayer {
         if (!initializeStreams())
             System.exit(-2);
 
+        outer:
         while (true) {
             AccessEvent accessEvent = receiveRequests();
             OperationType operationType = (accessEvent != null) ? accessEvent.getOperationType() : null;
@@ -49,7 +50,8 @@ public class ServerCommunicationLayer {
 
             switch (operationType) {
                 case READ: { // Handle a read event
-                    if (!sendBlocks(application.read(addresses))) return;
+                    if (!sendBlocks(application.read(addresses)))
+                        break outer;
                     break;
                 }
                 case WRITE: { // Handle a write event
@@ -59,20 +61,34 @@ public class ServerCommunicationLayer {
 
                     if (!(statusBit && sendStatusBit)) {
                         logger.error("Status bit: " + statusBit + ", send status bit: " + sendStatusBit);
-                        return;
+                        break outer;
                     }
                     break;
                 }
                 case END: {
-                    blockCreator.createBlocks(addresses);
-                    return;
+                    if (sendWritingStatusBit(blockCreator.createBlocks(addresses))) {
+                        System.out.println("Successfully send writing status bit");
+                        logger.info("Successfully send writing status bit");
+                    } else{
+                        System.out.println("Failed to send writing status bit");
+                        logger.error("Failed to send writing status bit");
+                    }
+
+                    break outer;
                 }
                 default:
                     logger.error("There seems to be missing a operation type");
-                    return;
+                    break outer;
             }
         }
-//        TODO: close session
+        try {
+            dataOutputStream.close();
+            dataInputStream.close();
+            socket.close();
+        } catch (IOException e) {
+            logger.error("Error happened while closing streams/socket: " + e);
+            logger.debug("Stacktrace", e);
+        }
     }
 
     private boolean initializeStreams() {

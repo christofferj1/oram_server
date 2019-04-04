@@ -40,7 +40,7 @@ public class BlockEncrypted implements Serializable {
 //            return "DUMMY COUNTER: " + Util.byteArrayToLeInt(data);
         return "BlockEncrypted{" +
                 "address=" + Arrays.toString(address) +
-                ", data=" + Arrays.toString(data ) +
+                ", data=" + Arrays.toString(data) +
                 '}';
     }
 
