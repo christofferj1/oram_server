@@ -1,86 +1,83 @@
 package oram;
 
-import oram.server.ServerApplication;
-import oram.server.ServerApplicationImpl;
-import oram.server.ServerCommunicationLayer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import oram.blockcreator.BlockCreator;
+import oram.blockcreator.LookaheadBlockCreator;
+import oram.blockcreator.StandardBlockCreator;
+import oram.server.MainServer;
 
-import java.io.IOException;
-import java.net.*;
-import java.util.Enumeration;
+import java.util.Scanner;
 
 /**
- * <p> ORAM <br>
- * Created by Christoffer S. Jensen on 11-03-2019. <br>
+ * <p> oram_server <br>
+ * Created by Christoffer S. Jensen on 04-04-2019. <br>
  * Master Thesis 2019 </p>
  */
 
 public class Main {
-    private static final Logger logger = LogManager.getLogger("log");
-
     public static void main(String[] args) {
-        logger.debug("######### INITIALIZED SERVER #########");
-        logger.info("######### INITIALIZED SERVER #########");
+        Scanner scanner = new Scanner(System.in);
 
-//        TODO: check that the files directory exists
+        System.out.println("Create files or run server? [f/s]");
+        String answer = scanner.nextLine();
+        while (!(answer.equals("f") || answer.equals("s"))) {
+            System.out.println("Answer either 'f' or 's'");
+            answer = scanner.nextLine();
+        }
 
-        ServerApplication serverApplication = new ServerApplicationImpl();
-
-        System.out.println(getIPAddress());
-
-        ServerSocket serverSocket = openServerSocket();
-        if (serverSocket == null) System.exit(-1);
-        Socket socket = openSocket(serverSocket);
-        if (socket == null) System.exit(-2);
-
-        new ServerCommunicationLayer(serverApplication).run(socket);
+        if (answer.equals("f")) {
+            generateFiles(scanner);
+        } else {
+            runServer(scanner);
+        }
     }
 
-    private static ServerSocket openServerSocket() {
-        ServerSocket serverSocket;
-        try {
-            serverSocket = new ServerSocket(Constants.PORT);
-        } catch (IOException e) {
-            logger.error("Unable to create server socket" + e);
-            logger.debug("Stacktrace", e);
-            return null;
+    private static void generateFiles(Scanner scanner) {
+        String answer;
+        System.out.println("How many files to create?");
+        answer = scanner.nextLine();
+        while (!answer.matches("\\d+")) {
+            System.out.println("Put in an integer");
+            answer = scanner.nextLine();
         }
-        return serverSocket;
+        int numberOfFiles = Integer.parseInt(answer);
+
+        System.out.println("Lookahead or standard blocks? [l/s]");
+        answer = scanner.nextLine();
+        while (!(answer.equals("l") || answer.equals("s"))) {
+            System.out.println("Answer either 'l' or 's'");
+            answer = scanner.nextLine();
+        }
+
+        if (answer.equals("l")) {
+            LookaheadBlockCreator blockCreator = new LookaheadBlockCreator();
+            if (blockCreator.createBlocks(numberOfFiles))
+                System.out.println("Created " + numberOfFiles + " Lookahead files successfully");
+            else
+                System.out.println("Unable to create " + numberOfFiles + " Lookahead files");
+        } else {
+            StandardBlockCreator blockCreator = new StandardBlockCreator();
+            if (blockCreator.createBlocks(numberOfFiles))
+                System.out.println("Created " + numberOfFiles + " Standard files successfully");
+            else
+                System.out.println("Unable to create " + numberOfFiles + " Standard files");
+        }
     }
 
-    private static Socket openSocket(ServerSocket serverSocket) {
-        Socket socket;
-        try {
-            socket = serverSocket.accept();
-            System.out.println("Client accepted, inet address: " + socket.getInetAddress());
-            logger.info("Client accepted, inet address: " + socket.getInetAddress());
-        } catch (IOException e) {
-            logger.error("Unable to create socket" + e);
-            logger.debug("Stacktrace", e);
-            return null;
+    private static void runServer(Scanner scanner) {
+        String answer;
+        System.out.println("Lookahead or Standard blocks? [l/s]");
+        answer = scanner.nextLine();
+        while (!(answer.equals("l") || answer.equals("s"))) {
+            System.out.println("Answer either 'l' or 's'");
+            answer = scanner.nextLine();
         }
-        return socket;
-    }
 
-    private static String getIPAddress() {
-        Enumeration en = null;
-        try {
-            en = NetworkInterface.getNetworkInterfaces();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-        while (en.hasMoreElements()) {
-            NetworkInterface i = (NetworkInterface) en.nextElement();
-            for (Enumeration en2 = i.getInetAddresses(); en2.hasMoreElements(); ) {
-                InetAddress addr = (InetAddress) en2.nextElement();
-                if (!addr.isLoopbackAddress()) {
-                    if (addr instanceof Inet4Address) {
-                        return addr.getHostAddress();
-                    }
-                }
-            }
-        }
-        return null;
+        BlockCreator blockCreator;
+        if (answer.equals("l"))
+            blockCreator = new LookaheadBlockCreator();
+        else
+            blockCreator = new StandardBlockCreator();
+
+        new MainServer().runServer(blockCreator);
     }
 }

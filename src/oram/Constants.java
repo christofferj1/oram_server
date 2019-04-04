@@ -14,4 +14,7 @@ public class Constants {
     public static final int BLOCK_SIZE = 16;
     public static final int AES_KEY_SIZE = 16;
     public static final int AES_BLOCK_SIZE = 16;
+
+    public static final String FILES_DIR = System.getProperty("user.dir") + "/files/";
+//    public static final String FILES_DIR = System.getProperty("user.home") + "/files/";
 }

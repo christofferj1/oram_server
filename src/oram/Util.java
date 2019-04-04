@@ -3,6 +3,8 @@ package oram;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
@@ -49,6 +51,7 @@ public class Util {
         bb.putInt(i);
         return bb.array();
     }
+
     public static String getTimeString(long milliseconds) {
         int hours = (int) (milliseconds / 3600000);
         int minutes = (int) (milliseconds % 3600000) / 60000;
@@ -87,5 +90,17 @@ public class Util {
         } else
             dataString = Arrays.toString(data);
         return dataString;
+    }
+
+    public static boolean writeFile(byte[] bytesForFile, String fileName) {
+        String filePath = Constants.FILES_DIR + fileName;
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(bytesForFile);
+        } catch (IOException e) {
+            logger.error("Error happened while writing file: " + filePath + ", " + e);
+            logger.debug("Stacktrace", e);
+            return false;
+        }
+        return true;
     }
 }

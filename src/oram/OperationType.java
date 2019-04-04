@@ -6,5 +6,5 @@ package oram;
  */
 
 public enum OperationType {
-    READ, WRITE
+    READ, WRITE, END
 }

@@ -2,6 +2,7 @@ package oram.server;
 
 import oram.OperationType;
 import oram.Util;
+import oram.blockcreator.BlockCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,7 +31,7 @@ public class ServerCommunicationLayer {
         this.application = application;
     }
 
-    public void run(Socket socket) {
+    public void run(Socket socket, BlockCreator blockCreator) {
         this.socket = socket;
 
         if (!initializeStreams())
@@ -46,14 +47,29 @@ public class ServerCommunicationLayer {
                     (operationType.equals(OperationType.READ) ? " READ" : "WRITE") +
                     ", to addresses: " + Arrays.toString(addresses.toArray()));
 
-            if (operationType.equals(OperationType.READ)) { // Handle a read event
-                if (!sendBlocks(application.read(addresses))) break;
-            } else { // Handle a write event
-                List<byte[]> dataArrays = accessEvent.getDataArrays();
-                boolean statusBit = application.write(addresses, dataArrays);
-                boolean sendStatusBit = sendWritingStatusBit(statusBit); // TODO: test the workflow if status = 0
+            switch (operationType) {
+                case READ: { // Handle a read event
+                    if (!sendBlocks(application.read(addresses))) return;
+                    break;
+                }
+                case WRITE: { // Handle a write event
+                    List<byte[]> dataArrays = accessEvent.getDataArrays();
+                    boolean statusBit = application.write(addresses, dataArrays);
+                    boolean sendStatusBit = sendWritingStatusBit(statusBit);
 
-                if (!(statusBit && sendStatusBit)) break;
+                    if (!(statusBit && sendStatusBit)) {
+                        logger.error("Status bit: " + statusBit + ", send status bit: " + sendStatusBit);
+                        return;
+                    }
+                    break;
+                }
+                case END: {
+                    blockCreator.createBlocks(addresses);
+                    return;
+                }
+                default:
+                    logger.error("There seems to be missing a operation type");
+                    return;
             }
         }
 //        TODO: close session
@@ -77,31 +93,43 @@ public class ServerCommunicationLayer {
         if (numberOfRequestsBytes == null) return null;
 
         int operationTypeInt = Util.byteArrayToLeInt(operationTypeBytes);
-        OperationType op = operationTypeInt == 0 ? OperationType.READ : OperationType.WRITE;
-
         int numberOfRequests = Util.byteArrayToLeInt(numberOfRequestsBytes);
-
-        if (op.equals(OperationType.READ)) {
-            List<String> addresses = new ArrayList<>();
-            for (int i = 0; i < numberOfRequests; i++) {
-                byte[] addressBytes = readBytes();
-                if (addressBytes == null) return null;
-                addresses.add(Integer.toString(Util.byteArrayToLeInt(addressBytes)));
+        switch (operationTypeInt) {
+            case 0: {
+                List<String> addresses = new ArrayList<>();
+                for (int i = 0; i < numberOfRequests; i++) {
+                    byte[] addressBytes = readBytes();
+                    if (addressBytes == null) return null;
+                    addresses.add(Integer.toString(Util.byteArrayToLeInt(addressBytes)));
+                }
+                return new AccessEvent(addresses, null, OperationType.READ);
             }
-            return new AccessEvent(addresses, null, op);
-        } else {
-            List<String> addresses = new ArrayList<>();
-            List<byte[]> dataArrays = new ArrayList<>();
-            for (int i = 0; i < numberOfRequests; i++) {
-                byte[] addressBytes = readBytes();
-                if (addressBytes == null) return null;
-                addresses.add(Integer.toString(Util.byteArrayToLeInt(addressBytes)));
+            case 1: {
+                List<String> addresses = new ArrayList<>();
+                List<byte[]> dataArrays = new ArrayList<>();
+                for (int i = 0; i < numberOfRequests; i++) {
+                    byte[] addressBytes = readBytes();
+                    if (addressBytes == null) return null;
+                    addresses.add(Integer.toString(Util.byteArrayToLeInt(addressBytes)));
 
-                byte[] data = readBytes();
-                if (data == null) return null;
-                dataArrays.add(data);
+                    byte[] data = readBytes();
+                    if (data == null) return null;
+                    dataArrays.add(data);
+                }
+                return new AccessEvent(addresses, dataArrays, OperationType.WRITE);
             }
-            return new AccessEvent(addresses, dataArrays, op);
+            case 2: {
+                List<String> addresses = new ArrayList<>();
+                for (int i = 0; i < numberOfRequests; i++) {
+                    byte[] addressBytes = readBytes();
+                    if (addressBytes == null) return null;
+                    addresses.add(Integer.toString(Util.byteArrayToLeInt(addressBytes)));
+                }
+                return new AccessEvent(addresses, null, OperationType.END);
+            }
+            default:
+                logger.error("What kind op operation type did you mean?");
+                return null;
         }
     }
 
