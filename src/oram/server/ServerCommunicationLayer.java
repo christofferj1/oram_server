@@ -10,9 +10,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p> ORAM <br>
@@ -26,9 +24,11 @@ public class ServerCommunicationLayer {
     private ServerApplication application;
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
+    Set<String> filesWritten;
 
     public ServerCommunicationLayer(ServerApplication application) {
         this.application = application;
+        filesWritten = new HashSet<>();
     }
 
     public void run(Socket socket, BlockCreator blockCreator) {
@@ -44,9 +44,9 @@ public class ServerCommunicationLayer {
             if (accessEvent == null || operationType == null) break;
 
             List<String> addresses = accessEvent.getAddresses();
-            logger.info("Received access event of type: " +
-                    (operationType.equals(OperationType.READ) ? " READ" : "WRITE") +
-                    ", to addresses: " + Arrays.toString(addresses.toArray()));
+
+            logger.info("Received access event of type: " + operationType + ", to addresses: " +
+                    (operationType.equals(OperationType.END) ? Arrays.toString(addresses.toArray()) : null));
 
             switch (operationType) {
                 case READ: { // Handle a read event
@@ -63,10 +63,13 @@ public class ServerCommunicationLayer {
                         logger.error("Status bit: " + statusBit + ", send status bit: " + sendStatusBit);
                         break outer;
                     }
+                    filesWritten.addAll(addresses);
                     break;
                 }
                 case END: {
-                    if (sendWritingStatusBit(blockCreator.createBlocks(addresses))) {
+                    ArrayList<String> fileWrittenList = new ArrayList<>(filesWritten);
+                    Collections.sort(fileWrittenList);
+                    if (sendWritingStatusBit(blockCreator.createBlocks(fileWrittenList))) {
                         System.out.println("Successfully send writing status bit");
                         logger.info("Successfully send writing status bit");
                     } else{
@@ -135,13 +138,7 @@ public class ServerCommunicationLayer {
                 return new AccessEvent(addresses, dataArrays, OperationType.WRITE);
             }
             case 2: {
-                List<String> addresses = new ArrayList<>();
-                for (int i = 0; i < numberOfRequests; i++) {
-                    byte[] addressBytes = readBytes();
-                    if (addressBytes == null) return null;
-                    addresses.add(Integer.toString(Util.byteArrayToLeInt(addressBytes)));
-                }
-                return new AccessEvent(addresses, null, OperationType.END);
+                return new AccessEvent(null, null, OperationType.END);
             }
             default:
                 logger.error("What kind op operation type did you mean?");

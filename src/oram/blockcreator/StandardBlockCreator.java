@@ -12,8 +12,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static oram.Util.writeFile;
-
 /**
  * <p> oram_server <br>
  * Created by Christoffer S. Jensen on 04-04-2019. <br>
@@ -37,7 +35,7 @@ public class StandardBlockCreator implements BlockCreator {
             System.arraycopy(address, 0, bytesToWrite, 0, address.length);
             System.arraycopy(data, 0, bytesToWrite, address.length, data.length);
 
-            if (!writeFile(bytesToWrite, addresses.get(i))) {
+            if (!Util.writeFile(bytesToWrite, addresses.get(i))) {
                 logger.error("Unable to write file: " + i);
                 return false;
             }

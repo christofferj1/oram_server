@@ -1,9 +1,9 @@
 package oram.server;
 
+import oram.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -38,10 +38,9 @@ public class ServerApplicationImpl implements ServerApplication {
                     + ")");
             return false;
         }
-        for (int i = 0; i < addresses.size(); i++) {
-            boolean success = writeFile(dataArrays.get(i), addresses.get(i));
-            if (!success) return false;
-        }
+        for (int i = 0; i < addresses.size(); i++)
+            if (!Util.writeFile(dataArrays.get(i), addresses.get(i))) return false;
+
         return true;
     }
 
@@ -56,17 +55,5 @@ public class ServerApplicationImpl implements ServerApplication {
             return null;
         }
         return res;
-    }
-
-    private boolean writeFile(byte[] bytesForFile, String fileName) {
-        fileName = System.getProperty("user.dir") + "/files/" + fileName;
-        try (FileOutputStream fos = new FileOutputStream(fileName)) {
-            fos.write(bytesForFile);
-        } catch (IOException e) {
-            logger.error("Error happened while writing file: " + fileName + ", " + e);
-            logger.debug("Stacktrace", e);
-            return false;
-        }
-        return true;
     }
 }
