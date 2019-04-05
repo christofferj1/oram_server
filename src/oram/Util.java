@@ -52,33 +52,6 @@ public class Util {
         return bb.array();
     }
 
-    public static String getTimeString(long milliseconds) {
-        int hours = (int) (milliseconds / 3600000);
-        int minutes = (int) (milliseconds % 3600000) / 60000;
-        int seconds = (int) (milliseconds % 60000) / 1000;
-        int millisecondsMod = (int) (milliseconds % 1000);
-
-        String millisecondsString = "" + millisecondsMod;
-        if (millisecondsMod < 10) millisecondsString = "  " + millisecondsString;
-        if (millisecondsMod < 100) millisecondsString = " " + millisecondsString;
-
-        return String.format("%02d:%02d:%02d." + millisecondsString, hours, minutes, seconds);
-    }
-
-
-    public static void printPercentageDone(long startTime, double numberOfRounds, int roundNumber) {
-        double percentDone = ((roundNumber + 1) / numberOfRounds) * 100;
-        if ((percentDone % 1) == 0) {
-            int percentDoneInt = (int) percentDone;
-            long timeElapsed = (System.nanoTime() - startTime) / 1000000;
-            long timeElapsedPerPercent = timeElapsed / percentDoneInt;
-            long timeLeft = timeElapsedPerPercent * (100 - percentDoneInt);
-            System.out.println("Done with " + percentDoneInt + "%, time spend: " + getTimeString(timeElapsed) +
-                    ", estimated time left: " + getTimeString(timeLeft));
-            logger.info("Done with " + percentDoneInt + "%, time spend: " + getTimeString(timeElapsed) +
-                    ", estimated time left: " + getTimeString(timeLeft));
-        }
-    }
 
     public static String getShortDataString(byte[] data) {
         String dataString;
@@ -102,5 +75,10 @@ public class Util {
             return false;
         }
         return true;
+    }
+
+    public static void logAndPrint(Logger logger, String string) {
+        System.out.println(string);
+        logger.info(string);
     }
 }

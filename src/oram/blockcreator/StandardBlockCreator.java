@@ -26,6 +26,7 @@ public class StandardBlockCreator implements BlockCreator {
         EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
         SecretKey secretKey = encryptionStrategy.generateSecretKey(Constants.KEY_BYTES);
         int numberOfFiles = addresses.size();
+        Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Standard files");
         for (int i = 0; i < numberOfFiles; i++) {
 
             BlockEncrypted block = getEncryptedDummy(secretKey, encryptionStrategy);
@@ -42,7 +43,7 @@ public class StandardBlockCreator implements BlockCreator {
 
             double percent = ((double) (i + 1) / numberOfFiles) * 100;
             if (percent % 1 == 0)
-                System.out.println("    Done with " + ((int) percent) + "% of the files");
+                Util.logAndPrint(logger, "    Done with " + ((int) percent) + "% of the files");
         }
 
         return true;
@@ -52,14 +53,14 @@ public class StandardBlockCreator implements BlockCreator {
         File filesDir = new File(Constants.FILES_DIR);
         String[] files = filesDir.list();
         if (files == null) {
-            System.out.println("Unable to get list of files");
+            Util.logAndPrint(logger,"Unable to get list of files");
             return false;
         }
 
         for (String s : files) {
             File f = new File(Constants.FILES_DIR + s);
             if (!f.delete()) {
-                System.out.println("Deleting files went wrong");
+                Util.logAndPrint(logger,"Deleting files went wrong");
                 return false;
             }
         }

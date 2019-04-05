@@ -27,10 +27,11 @@ public class LookaheadBlockCreator implements BlockCreator {
     public boolean createBlocks(List<String> addresses) {
         List<BlockLookahead> blocks = new ArrayList<>();
         int numberOfFiles = addresses.size();
+        Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Lookahead files");
         for (String ignored : addresses)
             blocks.add(getLookaheadDummyBlock());
 
-        System.out.println("    " + numberOfFiles + " dummy blocks created");
+        Util.logAndPrint(logger,"    " + numberOfFiles + " dummy blocks created");
 
         EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
         List<BlockEncrypted> encryptedList = encryptBlocks(blocks, encryptionStrategy,
@@ -38,7 +39,7 @@ public class LookaheadBlockCreator implements BlockCreator {
 
         if (encryptedList.isEmpty()) return false;
 
-        System.out.println("    Data encrypted");
+        Util.logAndPrint(logger,"    Data encrypted");
 
         for (int i = 0; i < numberOfFiles; i++) {
             byte[] data = encryptedList.get(i).getData();
@@ -54,7 +55,7 @@ public class LookaheadBlockCreator implements BlockCreator {
 
             double percent = ((double) (i + 1) / numberOfFiles) * 100;
             if (percent % 1 == 0)
-                System.out.println("    Done with " + ((int) percent) + "% of the files");
+                Util.logAndPrint(logger,"    Done with " + ((int) percent) + "% of the files");
         }
 
         return true;
@@ -64,14 +65,14 @@ public class LookaheadBlockCreator implements BlockCreator {
         File filesDir = new File(Constants.FILES_DIR);
         String[] files = filesDir.list();
         if (files == null) {
-            System.out.println("Unable to get list of files");
+            Util.logAndPrint(logger,"Unable to get list of files");
             return false;
         }
 
         for (String s : files) {
             File f = new File(Constants.FILES_DIR + s);
             if (!f.delete()) {
-                System.out.println("Deleting files went wrong");
+                Util.logAndPrint(logger,"Deleting files went wrong");
                 return false;
             }
         }

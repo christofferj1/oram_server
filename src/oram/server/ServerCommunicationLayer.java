@@ -24,7 +24,7 @@ public class ServerCommunicationLayer {
     private ServerApplication application;
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
-    Set<String> filesWritten;
+    private Set<String> filesWritten;
 
     public ServerCommunicationLayer(ServerApplication application) {
         this.application = application;
@@ -69,13 +69,11 @@ public class ServerCommunicationLayer {
                 case END: {
                     ArrayList<String> fileWrittenList = new ArrayList<>(filesWritten);
                     Collections.sort(fileWrittenList);
-                    if (sendWritingStatusBit(blockCreator.createBlocks(fileWrittenList))) {
-                        System.out.println("Successfully send writing status bit");
-                        logger.info("Successfully send writing status bit");
-                    } else{
-                        System.out.println("Failed to send writing status bit");
-                        logger.error("Failed to send writing status bit");
-                    }
+
+                    if (sendWritingStatusBit(blockCreator.createBlocks(fileWrittenList)))
+                        Util.logAndPrint(logger, "Successfully send writing status bit");
+                    else
+                        Util.logAndPrint(logger, "Failed to send writing status bit");
 
                     break outer;
                 }
