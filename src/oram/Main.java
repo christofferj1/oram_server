@@ -4,6 +4,8 @@ import oram.blockcreator.BlockCreator;
 import oram.blockcreator.LookaheadBlockCreator;
 import oram.blockcreator.StandardBlockCreator;
 import oram.server.MainServer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Scanner;
 
@@ -14,13 +16,15 @@ import java.util.Scanner;
  */
 
 public class Main {
+    private static final Logger logger = LogManager.getLogger("log");
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Create files or run server? [f/s]");
+        Util.logAndPrint(logger, "Create files or run server? [f/s]");
         String answer = scanner.nextLine();
         while (!(answer.equals("f") || answer.equals("s"))) {
-            System.out.println("Answer either 'f' or 's'");
+            Util.logAndPrint(logger, "Answer either 'f' or 's'");
             answer = scanner.nextLine();
         }
 
@@ -33,40 +37,40 @@ public class Main {
 
     private static void generateFiles(Scanner scanner) {
         String answer;
-        System.out.println("How many files to create?");
+        Util.logAndPrint(logger, "How many files to create?");
         answer = scanner.nextLine();
         while (!answer.matches("\\d+")) {
-            System.out.println("Put in an integer");
+            Util.logAndPrint(logger, "Put in an integer");
             answer = scanner.nextLine();
         }
         int numberOfFiles = Integer.parseInt(answer);
 
-        System.out.println("Lookahead or standard blocks? [l/s]");
+        Util.logAndPrint(logger, "Lookahead or standard blocks? [l/s]");
         answer = scanner.nextLine();
         while (!(answer.equals("l") || answer.equals("s"))) {
-            System.out.println("Answer either 'l' or 's'");
+            Util.logAndPrint(logger, "Answer either 'l' or 's'");
             answer = scanner.nextLine();
         }
 
         if (answer.equals("l")) {
             if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator()))
-                System.out.println("Created " + numberOfFiles + " Lookahead files successfully");
+                Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
             else
-                System.out.println("Unable to create " + numberOfFiles + " Lookahead files");
+                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Lookahead files");
         } else {
             if (Util.createBlocks(numberOfFiles, new StandardBlockCreator()))
-                System.out.println("Created " + numberOfFiles + " Standard files successfully");
+                Util.logAndPrint(logger, "Created " + numberOfFiles + " Standard files successfully");
             else
-                System.out.println("Unable to create " + numberOfFiles + " Standard files");
+                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Standard files");
         }
     }
 
     private static void runServer(Scanner scanner) {
         String answer;
-        System.out.println("Lookahead or Standard blocks? [l/s]");
+        Util.logAndPrint(logger, "Server with Lookahead or Standard blocks? [l/s]");
         answer = scanner.nextLine();
         while (!(answer.equals("l") || answer.equals("s"))) {
-            System.out.println("Answer either 'l' or 's'");
+            Util.logAndPrint(logger, "Answer either 'l' or 's'");
             answer = scanner.nextLine();
         }
 
