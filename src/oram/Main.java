@@ -49,14 +49,12 @@ public class Main {
         }
 
         if (answer.equals("l")) {
-            LookaheadBlockCreator blockCreator = new LookaheadBlockCreator();
-            if (blockCreator.createBlocks(numberOfFiles))
+            if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator()))
                 System.out.println("Created " + numberOfFiles + " Lookahead files successfully");
             else
                 System.out.println("Unable to create " + numberOfFiles + " Lookahead files");
         } else {
-            StandardBlockCreator blockCreator = new StandardBlockCreator();
-            if (blockCreator.createBlocks(numberOfFiles))
+            if (Util.createBlocks(numberOfFiles, new StandardBlockCreator()))
                 System.out.println("Created " + numberOfFiles + " Standard files successfully");
             else
                 System.out.println("Unable to create " + numberOfFiles + " Standard files");

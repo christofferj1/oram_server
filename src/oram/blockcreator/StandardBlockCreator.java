@@ -8,8 +8,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.crypto.SecretKey;
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,29 +45,6 @@ public class StandardBlockCreator implements BlockCreator {
         }
 
         return true;
-    }
-
-    public boolean createBlocks(int numberOfFiles) {
-        File filesDir = new File(Constants.FILES_DIR);
-        String[] files = filesDir.list();
-        if (files == null) {
-            Util.logAndPrint(logger,"Unable to get list of files");
-            return false;
-        }
-
-        for (String s : files) {
-            File f = new File(Constants.FILES_DIR + s);
-            if (!f.delete()) {
-                Util.logAndPrint(logger,"Deleting files went wrong");
-                return false;
-            }
-        }
-
-        List<String> addresses = new ArrayList<>();
-        for (int i = 0; i < numberOfFiles; i++)
-            addresses.add(String.valueOf(i));
-
-        return createBlocks(addresses);
     }
 
     private BlockEncrypted getEncryptedDummy(SecretKey key, EncryptionStrategyImpl encryptionStrategy) {

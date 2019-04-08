@@ -1,14 +1,18 @@
 package oram;
 
+import oram.blockcreator.BlockCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p> ORAM <br>
@@ -80,5 +84,34 @@ public class Util {
     public static void logAndPrint(Logger logger, String string) {
         System.out.println(string);
         logger.info(string);
+    }
+
+    public static boolean createBlocks(int numberOfFiles, BlockCreator blockCreator) {
+        File filesDir = new File(Constants.FILES_DIR);
+        String[] files = filesDir.list();
+        if (files == null) {
+            Util.logAndPrint(logger, "Unable to get list of files");
+            return false;
+        }
+
+        int numberOfFilesToDelete = files.length;
+        Util.logAndPrint(logger, "Deleting " + numberOfFilesToDelete + " files");
+        for (int i = 0; i < numberOfFilesToDelete; i++) {
+            File f = new File(Constants.FILES_DIR + files[i]);
+            if (!f.delete()) {
+                Util.logAndPrint(logger, "Deleting files went wrong");
+                return false;
+            }
+
+            double percent = ((double) (i + 1) / numberOfFilesToDelete) * 100;
+            if (percent % 10 == 0)
+                Util.logAndPrint(logger, "    Done with " + ((int) percent) + "% of the files");
+        }
+
+        List<String> addresses = new ArrayList<>();
+        for (int i = 0; i < numberOfFiles; i++)
+            addresses.add(String.valueOf(i));
+
+        return blockCreator.createBlocks(addresses);
     }
 }
