@@ -4,6 +4,7 @@ import oram.BlockEncrypted;
 import oram.Constants;
 import oram.EncryptionStrategyImpl;
 import oram.Util;
+import oram.block.BlockLookahead;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

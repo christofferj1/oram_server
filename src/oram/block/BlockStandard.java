@@ -1,4 +1,4 @@
-package oram.server;
+package oram.block;
 
 import java.io.Serializable;
 import java.util.Arrays;

@@ -2,6 +2,7 @@ package oram.server;
 
 import oram.OperationType;
 import oram.Util;
+import oram.block.BlockStandard;
 import oram.blockcreator.BlockCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

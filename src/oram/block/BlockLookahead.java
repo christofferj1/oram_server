@@ -1,6 +1,7 @@
-package oram.lookahead;
+package oram.block;
 
 import oram.Util;
+import oram.lookahead.Index;
 
 import java.util.Arrays;
 import java.util.Objects;

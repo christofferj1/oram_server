@@ -2,6 +2,7 @@ package oram;
 
 import oram.blockcreator.BlockCreator;
 import oram.blockcreator.LookaheadBlockCreator;
+import oram.blockcreator.PathBlockCreator;
 import oram.blockcreator.StandardBlockCreator;
 import oram.server.MainServer;
 import org.apache.logging.log4j.LogManager;
@@ -45,40 +46,56 @@ public class Main {
         }
         int numberOfFiles = Integer.parseInt(answer);
 
-        Util.logAndPrint(logger, "Lookahead or standard blocks? [l/s]");
+        Util.logAndPrint(logger, "Lookahead, Path or standard blocks? [l/p/s]");
         answer = scanner.nextLine();
-        while (!(answer.equals("l") || answer.equals("s"))) {
-            Util.logAndPrint(logger, "Answer either 'l' or 's'");
+        while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
+            Util.logAndPrint(logger, "Answer either 'l', 'p', or 's'");
             answer = scanner.nextLine();
         }
 
-        if (answer.equals("l")) {
-            if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator()))
-                Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
-            else
-                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Lookahead files");
-        } else {
-            if (Util.createBlocks(numberOfFiles, new StandardBlockCreator()))
-                Util.logAndPrint(logger, "Created " + numberOfFiles + " Standard files successfully");
-            else
-                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Standard files");
+        switch (answer) {
+            case "l":
+                if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator()))
+                    Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
+                else
+                    Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Lookahead files");
+                break;
+            case "p":
+                if (Util.createBlocks(numberOfFiles, new PathBlockCreator()))
+                    Util.logAndPrint(logger, "Created " + numberOfFiles + " Path files successfully");
+                else
+                    Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Path files");
+                break;
+            default:
+                if (Util.createBlocks(numberOfFiles, new StandardBlockCreator()))
+                    Util.logAndPrint(logger, "Created " + numberOfFiles + " Standard files successfully");
+                else
+                    Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Standard files");
+                break;
         }
     }
 
     private static void runServer(Scanner scanner) {
         String answer;
-        Util.logAndPrint(logger, "Server with Lookahead or Standard blocks? [l/s]");
+        Util.logAndPrint(logger, "Server with Lookahead or Standard blocks? [l/p/s]");
         answer = scanner.nextLine();
-        while (!(answer.equals("l") || answer.equals("s"))) {
-            Util.logAndPrint(logger, "Answer either 'l' or 's'");
+        while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
+            Util.logAndPrint(logger, "Answer either 'l', 'p', or 's'");
             answer = scanner.nextLine();
         }
 
         BlockCreator blockCreator;
-        if (answer.equals("l"))
-            blockCreator = new LookaheadBlockCreator();
-        else
-            blockCreator = new StandardBlockCreator();
+        switch (answer) {
+            case "l":
+                blockCreator = new LookaheadBlockCreator();
+                break;
+            case "p":
+                blockCreator = new PathBlockCreator();
+                break;
+            default:
+                blockCreator = new StandardBlockCreator();
+                break;
+        }
 
         new MainServer().runServer(blockCreator);
     }
