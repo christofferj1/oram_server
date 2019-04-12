@@ -25,7 +25,10 @@ public class ServerApplicationImpl implements ServerApplication {
         List<BlockStandard> res = new ArrayList<>();
         for (String address : addresses) {
             byte[] data = readFile(address);
-            if (data == null) return null;
+            if (data == null) {
+                logger.error("Reading file failed");
+                return null;
+            }
 
             res.add(new BlockStandard(Integer.parseInt(address), data));
         }

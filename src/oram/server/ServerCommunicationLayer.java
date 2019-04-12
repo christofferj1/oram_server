@@ -146,6 +146,10 @@ public class ServerCommunicationLayer {
     }
 
     private boolean sendBlocks(List<BlockStandard> blocks) {
+        if (blocks == null) {
+            logger.error("Blocks were null");
+            return false;
+        }
         try {
             for (BlockStandard block : blocks) {
                 int length = block.getData().length;
