@@ -17,4 +17,11 @@ public class Constants {
 
     public static final String FILES_DIR = System.getProperty("user.dir") + "/files/";
 //    public static final String FILES_DIR = System.getProperty("user.home") + "/files/";
+
+    public static final int SIZE_1 = 64;
+    public static final int SIZE_2 = 1024;
+    public static final int SIZE_3 = 16384;
+    public static final int SIZE_4 = 262144;
+    public static final int SIZE_5 = 4194304;
+    public static final int DEFAULT_BUCKET_SIZE = 4;
 }

@@ -8,6 +8,7 @@ import oram.server.MainServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -37,7 +38,12 @@ public class Main {
     }
 
     private static void generateFiles(Scanner scanner) {
-        String answer;
+        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
+        if (answer.equals("y")) {
+            createFilesInLayers();
+            return;
+        }
+
         Util.logAndPrint(logger, "How many files to create?");
         answer = scanner.nextLine();
         while (!answer.matches("\\d+")) {
@@ -72,6 +78,56 @@ public class Main {
                 else
                     Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Standard files");
                 break;
+        }
+    }
+
+    private static void createFilesInLayers() {
+        Util.logAndPrint(logger, "Delete files");
+        Util.deleteFiles();
+
+        int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
+        if (numberOfLayers > 5) {
+            Util.logAndPrint(logger, "Can't do more than 5 layers");
+            return;
+        } else if (numberOfLayers < 1) {
+            Util.logAndPrint(logger, "Number og layers must be a positive number");
+            return;
+        }
+
+        String answer;
+        Scanner scanner = new Scanner(System.in);
+        int offset = 0;
+        int newOffset;
+        List<String> addresses;
+
+        for (int i = 0; i < numberOfLayers; i++) {
+            Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/s]");
+            answer = scanner.nextLine();
+            while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
+                Util.logAndPrint(logger, "Answer either 'l', 'p', or 's'");
+                answer = scanner.nextLine();
+            }
+            int levelSize = (int) Math.pow(2, (((numberOfLayers - 1) - i) * 4) + 6);
+            switch (answer) {
+                case "l":
+                    newOffset = offset + levelSize + (int) (2 * Math.sqrt(levelSize));
+                    addresses = Util.getAddressStrings(offset, newOffset);
+                    offset = newOffset;
+                    new LookaheadBlockCreator().createBlocks(addresses);
+                    break;
+                case "p":
+                    newOffset = offset + (levelSize - 1) * Constants.DEFAULT_BUCKET_SIZE;
+                    addresses = Util.getAddressStrings(offset, newOffset);
+                    offset = newOffset;
+                    new PathBlockCreator().createBlocks(addresses);
+                    break;
+                default:
+                    newOffset = offset + levelSize + 1; // TODO: if this is chosen, the rest should not be there (we can return from here)
+                    addresses = Util.getAddressStrings(offset, newOffset);
+                    offset = newOffset;
+                    new StandardBlockCreator().createBlocks(addresses);
+            }
+
         }
     }
 

@@ -24,7 +24,7 @@ public class StandardBlockCreator implements BlockCreator {
         EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
         SecretKey secretKey = encryptionStrategy.generateSecretKey(Constants.KEY_BYTES);
         int numberOfFiles = addresses.size();
-        Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Standard files");
+        Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Standard files, from: " + addresses.get(0) + ", to: " + addresses.get(addresses.size() - 1));
         for (int i = 0; i < numberOfFiles; i++) {
 
             BlockEncrypted block = getEncryptedDummy(secretKey, encryptionStrategy);

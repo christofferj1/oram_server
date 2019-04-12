@@ -25,7 +25,7 @@ public class PathBlockCreator implements BlockCreator {
     public boolean createBlocks(List<String> addresses) {
         List<BlockPath> blocks = new ArrayList<>();
         int numberOfFiles = addresses.size();
-        Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Path files");
+        Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Path files, from: " + addresses.get(0) + ", to: " + addresses.get(addresses.size() - 1));
         for (String ignored : addresses)
             blocks.add(getPathDummyBlock());
 

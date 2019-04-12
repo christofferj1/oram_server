@@ -13,6 +13,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * <p> ORAM <br>
@@ -87,11 +88,28 @@ public class Util {
     }
 
     public static boolean createBlocks(int numberOfFiles, BlockCreator blockCreator) {
+        if (deleteFiles()) return false;
+
+        int from = 0;
+        int to = numberOfFiles + from;
+        List<String> addresses = getAddressStrings(from, to);
+
+        return blockCreator.createBlocks(addresses);
+    }
+
+    public static List<String> getAddressStrings(int from, int to) {
+        List<String> addresses = new ArrayList<>();
+        for (int i = from; i < to; i++)
+            addresses.add(String.valueOf(i));
+        return addresses;
+    }
+
+    public static boolean deleteFiles() {
         File filesDir = new File(Constants.FILES_DIR);
         String[] files = filesDir.list();
         if (files == null) {
             Util.logAndPrint(logger, "Unable to get list of files");
-            return false;
+            return true;
         }
 
         int numberOfFilesToDelete = files.length;
@@ -100,18 +118,38 @@ public class Util {
             File f = new File(Constants.FILES_DIR + files[i]);
             if (!f.delete()) {
                 Util.logAndPrint(logger, "Deleting files went wrong");
-                return false;
+                return true;
             }
 
             double percent = ((double) (i + 1) / numberOfFilesToDelete) * 100;
             if (percent % 10 == 0)
                 Util.logAndPrint(logger, "    Done with " + ((int) percent) + "% of the files");
         }
+        return false;
+    }
 
-        List<String> addresses = new ArrayList<>();
-        for (int i = 0; i < numberOfFiles; i++)
-            addresses.add(String.valueOf(i));
+    public static String getYesNoAnswer(Scanner scanner, String string) {
+        logAndPrint(logger, string);
+        String answer = scanner.nextLine();
+        logger.info("a");
+        while (!(answer.equals("y") || answer.equals("n"))) {
+            logAndPrint(logger, "Provide a yes or no answer [y/n]");
+            answer = scanner.nextLine();
+            logger.info(answer);
+        }
+        return answer;
+    }
 
-        return blockCreator.createBlocks(addresses);
+    public static int getInteger(String name) {
+        Scanner scanner = new Scanner(System.in);
+        logAndPrint(logger, "Enter integer for '" + name + "'");
+        String answer = scanner.nextLine();
+        logger.info(answer);
+        while (!answer.matches("\\d+")) {
+            logAndPrint(logger, "Enter integer for '" + name + "'");
+            answer = scanner.nextLine();
+            logger.info(answer);
+        }
+        return Integer.parseInt(answer);
     }
 }
