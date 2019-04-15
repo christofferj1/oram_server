@@ -23,6 +23,15 @@ public class PathBlockCreator implements BlockCreator {
 
     @Override
     public boolean createBlocks(List<String> addresses) {
+        if (addresses == null) {
+            Util.logAndPrint(logger, "Addresses were null");
+            return false;
+        }
+        if (addresses.isEmpty()) {
+            Util.logAndPrint(logger, "Addresses were empty");
+            return true;
+        }
+
         List<BlockPath> blocks = new ArrayList<>();
         int numberOfFiles = addresses.size();
         Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Path files, from: " + addresses.get(0) + ", to: " + addresses.get(addresses.size() - 1));

@@ -1,13 +1,13 @@
 package oram.server;
 
 import oram.Constants;
-import oram.blockcreator.BlockCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * <p> ORAM <br>
@@ -18,7 +18,7 @@ import java.util.Enumeration;
 public class MainServer {
     private static final Logger logger = LogManager.getLogger("log");
 
-    public void runServer(BlockCreator blockCreator) {
+    public void runServer(List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
         logger.debug("######### INITIALIZED SERVER #########");
         logger.info("######### INITIALIZED SERVER #########");
 
@@ -31,7 +31,7 @@ public class MainServer {
         Socket socket = openSocket(serverSocket);
         if (socket == null) System.exit(-2);
 
-        new ServerCommunicationLayer(serverApplication).run(socket, blockCreator);
+        new ServerCommunicationLayer(serverApplication).run(socket, lookAddresses, pathAddresses, trivAddresses);
     }
 
     private ServerSocket openServerSocket() {

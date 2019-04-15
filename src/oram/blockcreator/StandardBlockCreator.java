@@ -21,6 +21,15 @@ public class StandardBlockCreator implements BlockCreator {
 
     @Override
     public boolean createBlocks(List<String> addresses) {
+        if (addresses == null) {
+            Util.logAndPrint(logger, "Addresses were null");
+            return false;
+        }
+        if (addresses.isEmpty()) {
+            Util.logAndPrint(logger, "Addresses were empty");
+            return true;
+        }
+
         EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
         SecretKey secretKey = encryptionStrategy.generateSecretKey(Constants.KEY_BYTES);
         int numberOfFiles = addresses.size();

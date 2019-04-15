@@ -3,7 +3,6 @@ package oram.server;
 import oram.OperationType;
 import oram.Util;
 import oram.block.BlockStandard;
-import oram.blockcreator.BlockCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +31,7 @@ public class ServerCommunicationLayer {
         filesWritten = new HashSet<>();
     }
 
-    public void run(Socket socket, BlockCreator blockCreator) {
+    public void run(Socket socket, List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
         this.socket = socket;
 
         if (!initializeStreams())
@@ -41,15 +40,16 @@ public class ServerCommunicationLayer {
         outer:
         while (true) {
             AccessEvent accessEvent = receiveRequests();
-            OperationType operationType = (accessEvent != null) ? accessEvent.getOperationType() : null;
-            if (accessEvent == null || operationType == null) break;
+            OperationType opType = (accessEvent != null) ? accessEvent.getOperationType() : null;
+            if (accessEvent == null || opType == null) break;
 
             List<String> addresses = accessEvent.getAddresses();
 
-            logger.info("Received access event of type: " + operationType + ", to addresses: " +
-                    (operationType.equals(OperationType.END) ? null : Arrays.toString(addresses.toArray())));
+            boolean hasAddresses = opType.equals(OperationType.READ) || opType.equals(OperationType.WRITE);
+            logger.info("Received access event of type: " + opType + ", to addresses: " +
+                    (hasAddresses ? Arrays.toString(addresses.toArray()) : null));
 
-            switch (operationType) {
+            switch (opType) {
                 case READ: { // Handle a read event
                     if (!sendBlocks(application.read(addresses)))
                         break outer;
@@ -71,12 +71,21 @@ public class ServerCommunicationLayer {
                     ArrayList<String> fileWrittenList = new ArrayList<>(filesWritten);
                     Collections.sort(fileWrittenList);
 
-                    if (sendWritingStatusBit(blockCreator.createBlocks(fileWrittenList)))
+                    if (sendWritingStatusBit(Util.recreateBlocks(fileWrittenList, lookAddresses, pathAddresses,
+                            trivAddresses)))
                         Util.logAndPrint(logger, "Successfully send writing status bit");
                     else
                         Util.logAndPrint(logger, "Failed to send writing status bit");
 
                     break outer;
+                }
+                case SPEED_TEST: {
+                    boolean write = sendData(accessEvent.getDataArrays().get(0));
+                    if (!write) {
+                        Util.logAndPrint(logger, "Unable to do speed test");
+                        break outer;
+                    }
+                    break;
                 }
                 default:
                     logger.error("There seems to be missing a operation type");
@@ -139,6 +148,12 @@ public class ServerCommunicationLayer {
             case 2: {
                 return new AccessEvent(null, null, OperationType.END);
             }
+            case 3: {
+                byte[] data = readBytes();
+                if (data == null)
+                    return null;
+                return new AccessEvent(null, Collections.singletonList(data), OperationType.SPEED_TEST);
+            }
             default:
                 logger.error("What kind op operation type did you mean?");
                 return null;
@@ -152,13 +167,26 @@ public class ServerCommunicationLayer {
         }
         try {
             for (BlockStandard block : blocks) {
-                int length = block.getData().length;
-                dataOutputStream.write(Util.beIntToByteArray(length));
-                dataOutputStream.write(block.getData());
+                if (!sendData(block.getData()))
+                    return false;
             }
             dataOutputStream.flush();
         } catch (IOException e) {
             logger.error("Error happened while sending block: " + e);
+            logger.debug("Stacktrace", e);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean sendData(byte[] data) {
+        try {
+            int length = data.length;
+            dataOutputStream.write(Util.beIntToByteArray(length));
+            dataOutputStream.write(data);
+
+        } catch (IOException e) {
+            logger.error("Error happened while sending data: " + e);
             logger.debug("Stacktrace", e);
             return false;
         }

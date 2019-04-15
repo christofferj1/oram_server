@@ -1,6 +1,5 @@
 package oram;
 
-import oram.blockcreator.BlockCreator;
 import oram.blockcreator.LookaheadBlockCreator;
 import oram.blockcreator.PathBlockCreator;
 import oram.blockcreator.StandardBlockCreator;
@@ -8,6 +7,7 @@ import oram.server.MainServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -38,7 +38,8 @@ public class Main {
     }
 
     private static void generateFiles(Scanner scanner) {
-        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
+        String answer = "y";
+//        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
         if (answer.equals("y")) {
             createFilesInLayers();
             return;
@@ -85,7 +86,8 @@ public class Main {
         Util.logAndPrint(logger, "Delete files");
         Util.deleteFiles();
 
-        int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
+        int numberOfLayers = 2;
+//        int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
         if (numberOfLayers > 5) {
             Util.logAndPrint(logger, "Can't do more than 5 layers");
             return;
@@ -100,6 +102,7 @@ public class Main {
         int newOffset;
         List<String> addresses;
 
+        outer:
         for (int i = 0; i < numberOfLayers; i++) {
             Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/s]");
             answer = scanner.nextLine();
@@ -124,15 +127,20 @@ public class Main {
                 default:
                     newOffset = offset + levelSize + 1; // TODO: if this is chosen, the rest should not be there (we can return from here)
                     addresses = Util.getAddressStrings(offset, newOffset);
-                    offset = newOffset;
                     new StandardBlockCreator().createBlocks(addresses);
+                    break outer;
             }
 
         }
     }
 
     private static void runServer(Scanner scanner) {
-        String answer;
+        String answer = Util.getYesNoAnswer(scanner, "Run server in layers? [y/n]");
+        if (answer.equals("y")) {
+            runLayeredServer(scanner);
+            return;
+        }
+
         Util.logAndPrint(logger, "Server with Lookahead or Standard blocks? [l/p/s]");
         answer = scanner.nextLine();
         while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
@@ -140,19 +148,69 @@ public class Main {
             answer = scanner.nextLine();
         }
 
-        BlockCreator blockCreator;
+        int numberOfAddresses = Util.getInteger("max number of addresses");
+
         switch (answer) {
             case "l":
-                blockCreator = new LookaheadBlockCreator();
-                break;
+                new MainServer().runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(),
+                        new ArrayList<>());
             case "p":
-                blockCreator = new PathBlockCreator();
-                break;
+                new MainServer().runServer(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses),
+                        new ArrayList<>());
             default:
-                blockCreator = new StandardBlockCreator();
-                break;
+                new MainServer().runServer(new ArrayList<>(), new ArrayList<>(),
+                        Util.getAddressStrings(0, numberOfAddresses));
+        }
+    }
+
+    private static void runLayeredServer(Scanner scanner) {
+        int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
+        if (numberOfLayers > 5) {
+            Util.logAndPrint(logger, "Can't do more than 5 layers");
+            return;
+        } else if (numberOfLayers < 1) {
+            Util.logAndPrint(logger, "Number og layers must be a positive number");
+            return;
         }
 
-        new MainServer().runServer(blockCreator);
+        String answer;
+        int offset = 0;
+        int newOffset;
+        List<String> addresses;
+
+        List<String> lookAddresses = new ArrayList<>();
+        List<String> pathAddresses = new ArrayList<>();
+        List<String> trivAddresses = new ArrayList<>();
+
+        outer:
+        for (int i = 0; i < numberOfLayers; i++) {
+            Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/s]");
+            answer = scanner.nextLine();
+            while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
+                Util.logAndPrint(logger, "Answer either 'l', 'p', or 's'");
+                answer = scanner.nextLine();
+            }
+            int levelSize = (int) Math.pow(2, (((numberOfLayers - 1) - i) * 4) + 6);
+            switch (answer) {
+                case "l":
+                    newOffset = offset + levelSize + (int) (2 * Math.sqrt(levelSize));
+                    addresses = Util.getAddressStrings(offset, newOffset);
+                    offset = newOffset;
+                    lookAddresses.addAll(addresses);
+                    break;
+                case "p":
+                    newOffset = offset + (levelSize - 1) * Constants.DEFAULT_BUCKET_SIZE;
+                    addresses = Util.getAddressStrings(offset, newOffset);
+                    offset = newOffset;
+                    pathAddresses.addAll(addresses);
+                    break;
+                default:
+                    newOffset = offset + levelSize + 1;
+                    addresses = Util.getAddressStrings(offset, newOffset);
+                    trivAddresses.addAll(addresses);
+                    break outer;
+            }
+        }
+        new MainServer().runServer(lookAddresses, pathAddresses, trivAddresses);
     }
 }

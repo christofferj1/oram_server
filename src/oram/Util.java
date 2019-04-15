@@ -1,6 +1,9 @@
 package oram;
 
 import oram.blockcreator.BlockCreator;
+import oram.blockcreator.LookaheadBlockCreator;
+import oram.blockcreator.PathBlockCreator;
+import oram.blockcreator.StandardBlockCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -151,5 +154,41 @@ public class Util {
             logger.info(answer);
         }
         return Integer.parseInt(answer);
+    }
+
+    public static boolean recreateBlocks(List<String> filesToWrite, List<String> lookAddresses,
+                                         List<String> pathAddresses, List<String> trivAddresses) {
+        if (!lookAddresses.isEmpty()) {
+            for (int i = lookAddresses.size() - 1; i >= 0; i--) {
+                String string = lookAddresses.get(i);
+                if (filesToWrite.contains(string)) {filesToWrite.remove(string);} else {lookAddresses.remove(i);}
+            }
+
+            boolean res = new LookaheadBlockCreator().createBlocks(lookAddresses);
+            if (!res) return false;
+        }
+
+        if (!pathAddresses.isEmpty()) {
+            for (int i = pathAddresses.size() - 1; i >= 0; i--) {
+                String string = pathAddresses.get(i);
+                if (filesToWrite.contains(string))
+                    filesToWrite.remove(string);
+                else
+                    pathAddresses.remove(i);
+            }
+
+            boolean res = new PathBlockCreator().createBlocks(pathAddresses);
+            if (!res) return false;
+        }
+
+        if (!trivAddresses.isEmpty()) {
+            for (int i = trivAddresses.size() - 1; i >= 0; i--) {
+                if (!filesToWrite.contains(trivAddresses.get(i)))
+                    trivAddresses.remove(i);
+            }
+
+            return new StandardBlockCreator().createBlocks(trivAddresses);
+        }
+        return true;
     }
 }
