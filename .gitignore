@@ -151,6 +151,7 @@ $RECYCLE.BIN/
 test_file
 files/
 filesPath/
+filesLook/
 
 # Created by https://www.gitignore.io/api/gradle
 # Edit at https://www.gitignore.io/?templates=gradle

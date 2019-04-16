@@ -38,8 +38,7 @@ public class Main {
     }
 
     private static void generateFiles(Scanner scanner) {
-        String answer = "y";
-//        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
+        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
         if (answer.equals("y")) {
             createFilesInLayers();
             return;
@@ -86,8 +85,7 @@ public class Main {
         Util.logAndPrint(logger, "Delete files");
         Util.deleteFiles();
 
-        int numberOfLayers = 2;
-//        int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
+        int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
         if (numberOfLayers > 5) {
             Util.logAndPrint(logger, "Can't do more than 5 layers");
             return;
@@ -101,6 +99,10 @@ public class Main {
         int offset = 0;
         int newOffset;
         List<String> addresses;
+
+        List<String> lookAddresses = new ArrayList<>();
+        List<String> pathAddresses = new ArrayList<>();
+        List<String> trivAddresses = new ArrayList<>();
 
         outer:
         for (int i = 0; i < numberOfLayers; i++) {
@@ -116,22 +118,24 @@ public class Main {
                     newOffset = offset + levelSize + (int) (2 * Math.sqrt(levelSize));
                     addresses = Util.getAddressStrings(offset, newOffset);
                     offset = newOffset;
-                    new LookaheadBlockCreator().createBlocks(addresses);
+                    lookAddresses.addAll(addresses);
                     break;
                 case "p":
                     newOffset = offset + (levelSize - 1) * Constants.DEFAULT_BUCKET_SIZE;
                     addresses = Util.getAddressStrings(offset, newOffset);
                     offset = newOffset;
-                    new PathBlockCreator().createBlocks(addresses);
+                    pathAddresses.addAll(addresses);
                     break;
                 default:
-                    newOffset = offset + levelSize + 1; // TODO: if this is chosen, the rest should not be there (we can return from here)
+                    newOffset = offset + levelSize + 1;
                     addresses = Util.getAddressStrings(offset, newOffset);
-                    new StandardBlockCreator().createBlocks(addresses);
+                    trivAddresses.addAll(addresses);
                     break outer;
             }
-
         }
+        new LookaheadBlockCreator().createBlocks(lookAddresses);
+        new PathBlockCreator().createBlocks(pathAddresses);
+        new StandardBlockCreator().createBlocks(trivAddresses);
     }
 
     private static void runServer(Scanner scanner) {
