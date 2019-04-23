@@ -10,14 +10,14 @@ import java.util.Objects;
  * Master Thesis 2019 </p>
  */
 
-public class BlockStandard implements Serializable {
+public class BlockTrivial implements Serializable {
     private Integer address;
     private byte[] data;
 
-    public BlockStandard() {
+    public BlockTrivial() {
     }
 
-    public BlockStandard(int address, byte[] data) {
+    public BlockTrivial(int address, byte[] data) {
         this.address = address;
         this.data = data;
     }
@@ -42,9 +42,9 @@ public class BlockStandard implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BlockStandard blockStandard = (BlockStandard) o;
-        return getAddress() == blockStandard.getAddress() &&
-                Arrays.equals(getData(), blockStandard.getData());
+        BlockTrivial blockTrivial = (BlockTrivial) o;
+        return getAddress() == blockTrivial.getAddress() &&
+                Arrays.equals(getData(), blockTrivial.getData());
     }
 
     @Override
@@ -57,7 +57,7 @@ public class BlockStandard implements Serializable {
 
     @Override
     public String toString() {
-        return "BlockStandard{" +
+        return "BlockTrivial{" +
                 "address=" + address +
                 ", data=" + Arrays.toString(data) +
                 '}';

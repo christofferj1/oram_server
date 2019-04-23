@@ -2,7 +2,7 @@ package oram.server;
 
 import oram.OperationType;
 import oram.Util;
-import oram.block.BlockStandard;
+import oram.block.BlockTrivial;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -160,13 +160,13 @@ public class ServerCommunicationLayer {
         }
     }
 
-    private boolean sendBlocks(List<BlockStandard> blocks) {
+    private boolean sendBlocks(List<BlockTrivial> blocks) {
         if (blocks == null) {
             logger.error("Blocks were null");
             return false;
         }
         try {
-            for (BlockStandard block : blocks) {
+            for (BlockTrivial block : blocks) {
                 if (!sendData(block.getData()))
                     return false;
             }

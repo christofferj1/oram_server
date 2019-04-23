@@ -2,7 +2,7 @@ package oram;
 
 import oram.blockcreator.LookaheadBlockCreator;
 import oram.blockcreator.PathBlockCreator;
-import oram.blockcreator.StandardBlockCreator;
+import oram.blockcreator.TrivialBlockCreator;
 import oram.server.MainServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +38,8 @@ public class Main {
     }
 
     private static void generateFiles(Scanner scanner) {
-        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
+        String answer = "y";
+//        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
         if (answer.equals("y")) {
             createFilesInLayers();
             return;
@@ -52,10 +53,10 @@ public class Main {
         }
         int numberOfFiles = Integer.parseInt(answer);
 
-        Util.logAndPrint(logger, "Lookahead, Path or standard blocks? [l/p/s]");
+        Util.logAndPrint(logger, "Lookahead, Path or trivial blocks? [l/p/t]");
         answer = scanner.nextLine();
-        while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
-            Util.logAndPrint(logger, "Answer either 'l', 'p', or 's'");
+        while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
+            Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
             answer = scanner.nextLine();
         }
 
@@ -73,10 +74,10 @@ public class Main {
                     Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Path files");
                 break;
             default:
-                if (Util.createBlocks(numberOfFiles, new StandardBlockCreator()))
-                    Util.logAndPrint(logger, "Created " + numberOfFiles + " Standard files successfully");
+                if (Util.createBlocks(numberOfFiles, new TrivialBlockCreator()))
+                    Util.logAndPrint(logger, "Created " + numberOfFiles + " Trivial files successfully");
                 else
-                    Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Standard files");
+                    Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Trivial files");
                 break;
         }
     }
@@ -106,10 +107,10 @@ public class Main {
 
         outer:
         for (int i = 0; i < numberOfLayers; i++) {
-            Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/s]");
+            Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/t]");
             answer = scanner.nextLine();
-            while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
-                Util.logAndPrint(logger, "Answer either 'l', 'p', or 's'");
+            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
+                Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
                 answer = scanner.nextLine();
             }
             int levelSize = (int) Math.pow(2, (((numberOfLayers - 1) - i) * 4) + 6);
@@ -135,20 +136,21 @@ public class Main {
         }
         new LookaheadBlockCreator().createBlocks(lookAddresses);
         new PathBlockCreator().createBlocks(pathAddresses);
-        new StandardBlockCreator().createBlocks(trivAddresses);
+        new TrivialBlockCreator().createBlocks(trivAddresses);
     }
 
     private static void runServer(Scanner scanner) {
-        String answer = Util.getYesNoAnswer(scanner, "Run server in layers? [y/n]");
+        String answer = "y";
+//        String answer = Util.getYesNoAnswer(scanner, "Run server in layers? [y/n]");
         if (answer.equals("y")) {
             runLayeredServer(scanner);
             return;
         }
 
-        Util.logAndPrint(logger, "Server with Lookahead or Standard blocks? [l/p/s]");
+        Util.logAndPrint(logger, "Server with Lookahead or Trivial blocks? [l/p/t]");
         answer = scanner.nextLine();
-        while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
-            Util.logAndPrint(logger, "Answer either 'l', 'p', or 's'");
+        while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
+            Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
             answer = scanner.nextLine();
         }
 
@@ -188,10 +190,10 @@ public class Main {
 
         outer:
         for (int i = 0; i < numberOfLayers; i++) {
-            Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/s]");
+            Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/t]");
             answer = scanner.nextLine();
-            while (!(answer.equals("l") || answer.equals("p") || answer.equals("s"))) {
-                Util.logAndPrint(logger, "Answer either 'l', 'p', or 's'");
+            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
+                Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
                 answer = scanner.nextLine();
             }
             int levelSize = (int) Math.pow(2, (((numberOfLayers - 1) - i) * 4) + 6);

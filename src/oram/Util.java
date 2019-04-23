@@ -3,7 +3,7 @@ package oram;
 import oram.blockcreator.BlockCreator;
 import oram.blockcreator.LookaheadBlockCreator;
 import oram.blockcreator.PathBlockCreator;
-import oram.blockcreator.StandardBlockCreator;
+import oram.blockcreator.TrivialBlockCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -187,7 +187,7 @@ public class Util {
                     trivAddresses.remove(i);
             }
 
-            return new StandardBlockCreator().createBlocks(trivAddresses);
+            return new TrivialBlockCreator().createBlocks(trivAddresses);
         }
         return true;
     }
