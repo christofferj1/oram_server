@@ -38,8 +38,7 @@ public class Main {
     }
 
     private static void generateFiles(Scanner scanner) {
-        String answer = "y";
-//        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
+        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
         if (answer.equals("y")) {
             createFilesInLayers();
             return;
