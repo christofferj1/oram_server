@@ -191,4 +191,15 @@ public class Util {
         }
         return true;
     }
+
+    public static List<List<String>> getListsOfAddresses(List<String> addresses) {
+        List<List<String>> addressLists = new ArrayList<>();
+        int rounds = (int) Math.ceil(addresses.size() / Constants.BLOCKS_CREATED_AT_A_TIME);
+        for (int i = 0; i < rounds; i++) {
+            int beginIndex = (int) (i * Constants.BLOCKS_CREATED_AT_A_TIME);
+            int endIndex = (int) Math.min(beginIndex + Constants.BLOCKS_CREATED_AT_A_TIME, addresses.size());
+            addressLists.add(addresses.subList(beginIndex, endIndex));
+        }
+        return addressLists;
+    }
 }

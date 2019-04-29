@@ -30,27 +30,33 @@ public class TrivialBlockCreator implements BlockCreator {
             return true;
         }
 
-        EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
-        SecretKey secretKey = encryptionStrategy.generateSecretKey(Constants.KEY_BYTES);
-        int numberOfFiles = addresses.size();
-        Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Trivial files, from: " + addresses.get(0) + ", to: " + addresses.get(addresses.size() - 1));
-        for (int i = 0; i < numberOfFiles; i++) {
+        Util.logAndPrint(logger, " --- Overwriting blocks in total: " + addresses.size());
+        List<List<String>> addressLists = Util.getListsOfAddresses(addresses);
 
-            BlockEncrypted block = getEncryptedDummy(secretKey, encryptionStrategy);
-            byte[] data = block.getData();
-            byte[] address = block.getAddress();
-            byte[] bytesToWrite = new byte[data.length + address.length];
-            System.arraycopy(address, 0, bytesToWrite, 0, address.length);
-            System.arraycopy(data, 0, bytesToWrite, address.length, data.length);
+        for (int j = 0; j < addressLists.size(); j++) {
+            List<String> currentAddresses = addressLists.get(j);
+            EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
+            SecretKey secretKey = encryptionStrategy.generateSecretKey(Constants.KEY_BYTES);
+            int numberOfFiles = currentAddresses.size();
+            Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Trivial files, from: " + currentAddresses.get(0) + ", to: " + currentAddresses.get(currentAddresses.size() - 1) + ", part " + (j + 1) + "/" + addressLists.size());
+            for (int i = 0; i < numberOfFiles; i++) {
 
-            if (!Util.writeFile(bytesToWrite, addresses.get(i))) {
-                logger.error("Unable to write file: " + i);
-                return false;
+                BlockEncrypted block = getEncryptedDummy(secretKey, encryptionStrategy);
+                byte[] data = block.getData();
+                byte[] address = block.getAddress();
+                byte[] bytesToWrite = new byte[data.length + address.length];
+                System.arraycopy(address, 0, bytesToWrite, 0, address.length);
+                System.arraycopy(data, 0, bytesToWrite, address.length, data.length);
+
+                if (!Util.writeFile(bytesToWrite, currentAddresses.get(i))) {
+                    logger.error("Unable to write file: " + i);
+                    return false;
+                }
+
+                double percent = ((double) (i + 1) / numberOfFiles) * 100;
+                if (percent % 10 == 0)
+                    Util.logAndPrint(logger, "    Done with " + ((int) percent) + "% of the files");
             }
-
-            double percent = ((double) (i + 1) / numberOfFiles) * 100;
-            if (percent % 1 == 0)
-                Util.logAndPrint(logger, "    Done with " + ((int) percent) + "% of the files");
         }
 
         return true;

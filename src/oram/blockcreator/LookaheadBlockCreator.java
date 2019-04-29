@@ -33,37 +33,43 @@ public class LookaheadBlockCreator implements BlockCreator {
             return true;
         }
 
-        List<BlockLookahead> blocks = new ArrayList<>();
-        int numberOfFiles = addresses.size();
-        Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Lookahead files, from: " + addresses.get(0) + ", to: " + addresses.get(addresses.size() - 1));
-        for (String ignored : addresses)
-            blocks.add(getLookaheadDummyBlock());
+        Util.logAndPrint(logger, " --- Overwriting blocks in total: " + addresses.size());
+        List<List<String>> addressLists = Util.getListsOfAddresses(addresses);
 
-        Util.logAndPrint(logger,"    " + numberOfFiles + " dummy blocks created");
+        for (int j = 0; j < addressLists.size(); j++) {
+            List<String> currentAddresses = addressLists.get(j);
+            List<BlockLookahead> blocks = new ArrayList<>();
+            int numberOfFiles = currentAddresses.size();
+            Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Lookahead files, from: " + currentAddresses.get(0) + ", to: " + currentAddresses.get(currentAddresses.size() - 1) + ", part " + (j + 1) + "/" + addressLists.size());
+            for (String ignored : currentAddresses)
+                blocks.add(getLookaheadDummyBlock());
 
-        EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
-        List<BlockEncrypted> encryptedList = encryptBlocks(blocks, encryptionStrategy,
-                encryptionStrategy.generateSecretKey(Constants.KEY_BYTES));
+            Util.logAndPrint(logger, "    " + numberOfFiles + " dummy blocks created");
 
-        if (encryptedList.isEmpty()) return false;
+            EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
+            List<BlockEncrypted> encryptedList = encryptBlocks(blocks, encryptionStrategy,
+                    encryptionStrategy.generateSecretKey(Constants.KEY_BYTES));
 
-        Util.logAndPrint(logger,"    Data encrypted");
+            if (encryptedList.isEmpty()) return false;
 
-        for (int i = 0; i < numberOfFiles; i++) {
-            byte[] data = encryptedList.get(i).getData();
-            byte[] address = encryptedList.get(i).getAddress();
-            byte[] bytesToWrite = new byte[data.length + address.length];
-            System.arraycopy(address, 0, bytesToWrite, 0, address.length);
-            System.arraycopy(data, 0, bytesToWrite, address.length, data.length);
+            Util.logAndPrint(logger, "    Data encrypted");
 
-            if (!Util.writeFile(bytesToWrite, addresses.get(i))) {
-                logger.error("Unable to write file: " + i);
-                return false;
+            for (int i = 0; i < numberOfFiles; i++) {
+                byte[] data = encryptedList.get(i).getData();
+                byte[] address = encryptedList.get(i).getAddress();
+                byte[] bytesToWrite = new byte[data.length + address.length];
+                System.arraycopy(address, 0, bytesToWrite, 0, address.length);
+                System.arraycopy(data, 0, bytesToWrite, address.length, data.length);
+
+                if (!Util.writeFile(bytesToWrite, currentAddresses.get(i))) {
+                    logger.error("Unable to write file: " + i);
+                    return false;
+                }
+
+                double percent = ((double) (i + 1) / numberOfFiles) * 100;
+                if (percent % 10 == 0)
+                    Util.logAndPrint(logger, "    Done with " + ((int) percent) + "% of the files");
             }
-
-            double percent = ((double) (i + 1) / numberOfFiles) * 100;
-            if (percent % 1 == 0)
-                Util.logAndPrint(logger,"    Done with " + ((int) percent) + "% of the files");
         }
 
         return true;
