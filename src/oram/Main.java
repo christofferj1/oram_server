@@ -106,10 +106,10 @@ public class Main {
 
         outer:
         for (int i = 0; i < numberOfLayers; i++) {
-            Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/t]");
+            Util.logAndPrint(logger, "Type of layer " + i + "? [l/lt/p/t]");
             answer = scanner.nextLine();
-            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
-                Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
+            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t")|| answer.equals("lt"))) {
+                Util.logAndPrint(logger, "Answer either 'l', 'lt', 'p', or 't'");
                 answer = scanner.nextLine();
             }
             int levelSize = (int) Math.pow(2, (((numberOfLayers - 1) - i) * 4) + 6);
@@ -120,6 +120,13 @@ public class Main {
                     offset = newOffset;
                     lookAddresses.addAll(addresses);
                     break;
+                case "lt":
+                    newOffset = offset + levelSize + (int) (2 * Math.sqrt(levelSize));
+                    newOffset += Math.ceil((double) levelSize / Constants.POSITION_BLOCK_SIZE);
+                    addresses = Util.getAddressStrings(offset, newOffset);
+
+                    lookAddresses.addAll(addresses);
+                    break outer;
                 case "p":
                     newOffset = offset + (levelSize - 1) * Constants.DEFAULT_BUCKET_SIZE;
                     addresses = Util.getAddressStrings(offset, newOffset);
@@ -139,8 +146,7 @@ public class Main {
     }
 
     private static void runServer(Scanner scanner) {
-        String answer = "y";
-//        String answer = Util.getYesNoAnswer(scanner, "Run server in layers? [y/n]");
+        String answer = Util.getYesNoAnswer(scanner, "Run server in layers? [y/n]");
         if (answer.equals("y")) {
             runLayeredServer(scanner);
             return;
@@ -189,10 +195,10 @@ public class Main {
 
         outer:
         for (int i = 0; i < numberOfLayers; i++) {
-            Util.logAndPrint(logger, "Type of layer " + i + "? [l/p/t]");
+            Util.logAndPrint(logger, "Type of layer " + i + "? [l/lt/p/t]");
             answer = scanner.nextLine();
-            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
-                Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
+            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t") || answer.equals("lt"))) {
+                Util.logAndPrint(logger, "Answer either 'l', 'lt', 'p', or 't'");
                 answer = scanner.nextLine();
             }
             int levelSize = (int) Math.pow(2, (((numberOfLayers - 1) - i) * 4) + 6);
@@ -203,6 +209,13 @@ public class Main {
                     offset = newOffset;
                     lookAddresses.addAll(addresses);
                     break;
+                case "lt":
+                    newOffset = offset + levelSize + (int) (2 * Math.sqrt(levelSize));
+                    newOffset += Math.ceil((double) levelSize / Constants.POSITION_BLOCK_SIZE);
+                    addresses = Util.getAddressStrings(offset, newOffset);
+
+                    lookAddresses.addAll(addresses);
+                    break outer;
                 case "p":
                     newOffset = offset + (levelSize - 1) * Constants.DEFAULT_BUCKET_SIZE;
                     addresses = Util.getAddressStrings(offset, newOffset);
