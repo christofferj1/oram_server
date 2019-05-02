@@ -17,8 +17,10 @@ import java.util.List;
 
 public class MainServer {
     private static final Logger logger = LogManager.getLogger("log");
+    private ServerSocket serverSocket;
 
-    public void runServer(List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
+    public void runServer(List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses,
+                          boolean continueVersion) {
         logger.debug("######### INITIALIZED SERVER #########");
         logger.info("######### INITIALIZED SERVER #########");
 
@@ -28,10 +30,28 @@ public class MainServer {
 
         ServerSocket serverSocket = openServerSocket();
         if (serverSocket == null) System.exit(-1);
+        this.serverSocket = serverSocket;
         Socket socket = openSocket(serverSocket);
         if (socket == null) System.exit(-2);
 
-        new ServerCommunicationLayer(serverApplication).run(socket, lookAddresses, pathAddresses, trivAddresses);
+        new ServerCommunicationLayer(serverApplication).run(socket, lookAddresses, pathAddresses, trivAddresses,
+                continueVersion);
+    }
+
+    public void runServerAgain(List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses,
+                          boolean continueVersion) {
+        logger.debug("######### INITIALIZED SERVER #########");
+        logger.info("######### INITIALIZED SERVER #########");
+
+        ServerApplication serverApplication = new ServerApplicationImpl();
+
+        System.out.println(getIPAddress());
+
+        Socket socket = openSocket(serverSocket);
+        if (socket == null) System.exit(-2);
+
+        new ServerCommunicationLayer(serverApplication).run(socket, lookAddresses, pathAddresses, trivAddresses,
+                continueVersion);
     }
 
     private ServerSocket openServerSocket() {

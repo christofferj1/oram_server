@@ -108,7 +108,7 @@ public class Main {
         for (int i = 0; i < numberOfLayers; i++) {
             Util.logAndPrint(logger, "Type of layer " + i + "? [l/lt/p/t]");
             answer = scanner.nextLine();
-            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t")|| answer.equals("lt"))) {
+            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t") || answer.equals("lt"))) {
                 Util.logAndPrint(logger, "Answer either 'l', 'lt', 'p', or 't'");
                 answer = scanner.nextLine();
             }
@@ -164,13 +164,13 @@ public class Main {
         switch (answer) {
             case "l":
                 new MainServer().runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(),
-                        new ArrayList<>());
+                        new ArrayList<>(), false);
             case "p":
                 new MainServer().runServer(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses),
-                        new ArrayList<>());
+                        new ArrayList<>(), false);
             default:
                 new MainServer().runServer(new ArrayList<>(), new ArrayList<>(),
-                        Util.getAddressStrings(0, numberOfAddresses));
+                        Util.getAddressStrings(0, numberOfAddresses), false);
         }
     }
 
@@ -229,6 +229,6 @@ public class Main {
                     break outer;
             }
         }
-        new MainServer().runServer(lookAddresses, pathAddresses, trivAddresses);
+        new MainServer().runServer(lookAddresses, pathAddresses, trivAddresses, false);
     }
 }

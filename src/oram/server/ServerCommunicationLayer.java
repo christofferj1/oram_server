@@ -3,6 +3,9 @@ package oram.server;
 import oram.OperationType;
 import oram.Util;
 import oram.block.BlockTrivial;
+import oram.blockcreator.LookaheadBlockCreator;
+import oram.blockcreator.PathBlockCreator;
+import oram.blockcreator.TrivialBlockCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,7 +34,8 @@ public class ServerCommunicationLayer {
         filesWritten = new HashSet<>();
     }
 
-    public void run(Socket socket, List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
+    public void run(Socket socket, List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses,
+                    boolean continueVersion) {
         this.socket = socket;
 
         if (!initializeStreams())
@@ -71,8 +75,14 @@ public class ServerCommunicationLayer {
                     ArrayList<String> fileWrittenList = new ArrayList<>(filesWritten);
                     Collections.sort(fileWrittenList);
 
-                    if (sendWritingStatusBit(Util.recreateBlocks(fileWrittenList, lookAddresses, pathAddresses,
-                            trivAddresses)))
+                    boolean writingStatus;
+                    if (continueVersion)
+                        writingStatus = generateFiles(lookAddresses, pathAddresses, trivAddresses);
+                    else
+                        writingStatus = Util.recreateBlocks(fileWrittenList, lookAddresses, pathAddresses,
+                                trivAddresses);
+
+                    if (sendWritingStatusBit(writingStatus))
                         Util.logAndPrint(logger, "Successfully send writing status bit");
                     else
                         Util.logAndPrint(logger, "Failed to send writing status bit");
@@ -95,6 +105,7 @@ public class ServerCommunicationLayer {
         try {
             dataOutputStream.close();
             dataInputStream.close();
+//            if (!continueVersion)
             socket.close();
         } catch (IOException e) {
             logger.error("Error happened while closing streams/socket: " + e);
@@ -223,5 +234,37 @@ public class ServerCommunicationLayer {
             return null;
         }
         return res;
+    }
+
+    private boolean generateFiles(List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
+        int numberOfFiles;
+        if (!lookAddresses.isEmpty()) {
+            numberOfFiles = lookAddresses.size();
+            if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator())) {
+                Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
+                return true;
+            } else {
+                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Lookahead files");
+                return false;
+            }
+        } else if (!pathAddresses.isEmpty()) {
+            numberOfFiles = pathAddresses.size();
+            if (Util.createBlocks(numberOfFiles, new PathBlockCreator())) {
+                Util.logAndPrint(logger, "Created " + numberOfFiles + " Path files successfully");
+                return true;
+            } else {
+                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Path files");
+                return false;
+            }
+        } else {
+            numberOfFiles = trivAddresses.size();
+            if (Util.createBlocks(numberOfFiles, new TrivialBlockCreator())) {
+                Util.logAndPrint(logger, "Created " + numberOfFiles + " Trivial files successfully");
+                return true;
+            } else {
+                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Trivial files");
+                return false;
+            }
+        }
     }
 }
