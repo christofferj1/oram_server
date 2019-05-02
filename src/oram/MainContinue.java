@@ -19,7 +19,7 @@ public class MainContinue {
     private static final Logger logger = LogManager.getLogger("log");
 
     public static void main(String[] args) {
-        int size = 64;
+        int size = Util.getInteger("Size");
         MainServer mainServer = new MainServer();
 
         generateFiles("l", size);
