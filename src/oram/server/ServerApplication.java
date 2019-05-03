@@ -11,7 +11,9 @@ import java.util.List;
  */
 
 public interface ServerApplication {
-    List<BlockTrivial> read(List<String> address);
+    BlockTrivial read(String address);
+
+    List<BlockTrivial> read(List<String> addresses);
 
     boolean write(String address, byte[] dataArray);
 

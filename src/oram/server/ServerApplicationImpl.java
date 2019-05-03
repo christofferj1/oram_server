@@ -22,6 +22,14 @@ public class ServerApplicationImpl implements ServerApplication {
     private final Logger logger = LogManager.getLogger("log");
 
     @Override
+    public BlockTrivial read(String address) {
+        List<BlockTrivial> read = read(Collections.singletonList(address));
+        if (read == null)
+            return null;
+        return read.get(0);
+    }
+
+    @Override
     public List<BlockTrivial> read(List<String> addresses) {
         List<BlockTrivial> res = new ArrayList<>();
         for (String address : addresses) {

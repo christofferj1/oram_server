@@ -51,8 +51,19 @@ public class ServerCommunicationLayer {
 
             switch (opType) {
                 case READ: { // Handle a read event
-                    if (!sendBlocks(application.read(addresses)))
+                    for (String address : addresses) {
+//                        List<BlockTrivial> read = application.read(addresses);
+                        BlockTrivial read = application.read(address);
+                        if (!sendBlock(read))
+                            break outer;
+                    }
+                    try {
+                        dataOutputStream.flush();
+                    } catch (IOException e) {
+                        logger.error("Error happened while sending block: " + e);
+                        logger.debug("Stacktrace", e);
                         break outer;
+                    }
                     break;
                 }
                 case WRITE: { // Handle a write event
@@ -134,7 +145,7 @@ public class ServerCommunicationLayer {
             }
             case 1: {
                 List<String> addresses = new ArrayList<>();
-                List<byte[]> dataArrays = new ArrayList<>();
+//                List<byte[]> dataArrays = new ArrayList<>();
                 for (int i = 0; i < numberOfRequests; i++) {
                     byte[] addressBytes = readBytes();
                     if (addressBytes == null) return null;
@@ -183,6 +194,14 @@ public class ServerCommunicationLayer {
             return false;
         }
         return true;
+    }
+
+    private boolean sendBlock(BlockTrivial block) {
+        if (block == null) {
+            logger.error("Block were null");
+            return false;
+        }
+        return sendData(block.getData());
     }
 
     private boolean sendData(byte[] data) {
