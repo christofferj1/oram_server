@@ -60,8 +60,9 @@ public class ServerCommunicationLayer {
                     break;
                 }
                 case WRITE: { // Handle a write event
-                    List<byte[]> dataArrays = accessEvent.getDataArrays();
-                    boolean statusBit = application.write(addresses, dataArrays);
+//                    List<byte[]> dataArrays = accessEvent.getDataArrays();
+//                    boolean statusBit = application.write(addresses, dataArrays);
+                    boolean statusBit = accessEvent.getDataArrays() != null;
                     boolean sendStatusBit = sendWritingStatusBit(statusBit);
 
                     if (!(statusBit && sendStatusBit)) {
@@ -152,9 +153,14 @@ public class ServerCommunicationLayer {
 
                     byte[] data = readBytes();
                     if (data == null) return null;
-                    dataArrays.add(data);
+
+                    boolean write = application.write(Integer.toString(Util.byteArrayToLeInt(addressBytes)), data);
+                    if (!write)
+                        return new AccessEvent(addresses, null, OperationType.WRITE);
+//                    dataArrays.add(data);
+
                 }
-                return new AccessEvent(addresses, dataArrays, OperationType.WRITE);
+                return new AccessEvent(addresses, new ArrayList<>(), OperationType.WRITE);
             }
             case 2: {
                 return new AccessEvent(null, null, OperationType.END);

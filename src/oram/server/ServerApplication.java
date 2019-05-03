@@ -13,5 +13,7 @@ import java.util.List;
 public interface ServerApplication {
     List<BlockTrivial> read(List<String> address);
 
+    boolean write(String address, byte[] dataArray);
+
     boolean write(List<String> addresses, List<byte[]> dataArrays);
 }

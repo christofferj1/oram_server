@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,6 +34,11 @@ public class ServerApplicationImpl implements ServerApplication {
             res.add(new BlockTrivial(Integer.parseInt(address), data));
         }
         return res;
+    }
+
+    @Override
+    public boolean write(String address, byte[] dataArray) {
+        return write(Collections.singletonList(address), Collections.singletonList(dataArray));
     }
 
     @Override
