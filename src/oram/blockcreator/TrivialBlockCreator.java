@@ -55,7 +55,8 @@ public class TrivialBlockCreator implements BlockCreator {
 
                 double percent = ((double) (i + 1) / numberOfFiles) * 100;
                 if (percent % 10 == 0)
-                    Util.logAndPrint(logger, "    Done with " + ((int) percent) + "% of the files");
+                    Util.logAndPrint(logger, "    Done with " + ((int) percent) + "% of the files of size: "
+                            + Constants.BLOCK_SIZE);
             }
         }
 
