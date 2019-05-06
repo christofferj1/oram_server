@@ -20,12 +20,34 @@ public class MainContinue {
 
     public static void main(String[] args) {
         int size = Util.getInteger("Size");
+        int size2 = Util.getInteger("Size 2");
         MainServer mainServer = new MainServer();
 
         generateFiles("l", size);
-        runServer("l", size, mainServer);
-        runServer("p", size, mainServer);
-        runServer("t", size, mainServer);
+
+        int numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (size - 1);
+        mainServer.runServer(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses),
+                new ArrayList<>(), true);
+
+        numberOfAddresses = size + 1;
+        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(),
+                Util.getAddressStrings(0, numberOfAddresses), true);
+
+
+        numberOfAddresses = (int) (size2 + 2 * Math.sqrt(size2));
+        mainServer.runServerAgain(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(),
+                true);
+
+        numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (size2 - 1);
+        mainServer.runServerAgain(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses),
+                new ArrayList<>(), true);
+
+        numberOfAddresses = size2 + 1;
+        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(),
+                Util.getAddressStrings(0, numberOfAddresses), true);
+
+        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+                true);
     }
 
     private static void generateFiles(String type, int size) {
