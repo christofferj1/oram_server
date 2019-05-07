@@ -19,8 +19,9 @@ public class MainContinue {
     private static final Logger logger = LogManager.getLogger("log");
 
     public static void main(String[] args) {
-        int size = Util.getInteger("Size");
-        int size2 = Util.getInteger("Size 2");
+        int size = 1024;
+        int size2 = 64;
+        int size3 = 16;
         MainServer mainServer = new MainServer();
 
         generateFiles("l", size);
@@ -43,6 +44,18 @@ public class MainContinue {
                 new ArrayList<>(), true);
 
         numberOfAddresses = size2 + 1;
+        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(),
+                Util.getAddressStrings(0, numberOfAddresses), true);
+
+        numberOfAddresses = (int) (size3 + 2 * Math.sqrt(size3));
+        mainServer.runServerAgain(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(),
+                true);
+
+        numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (size3 - 1);
+        mainServer.runServerAgain(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses),
+                new ArrayList<>(), true);
+
+        numberOfAddresses = size3 + 1;
         mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(),
                 Util.getAddressStrings(0, numberOfAddresses), true);
 
