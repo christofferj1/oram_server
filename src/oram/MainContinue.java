@@ -19,15 +19,23 @@ public class MainContinue {
     private static final Logger logger = LogManager.getLogger("log");
 
     public static void main(String[] args) {
-//        int size = 1024;
-        int size2 = 64;
-        int size3 = 16;
+        int size = 1024;
+//        int size2 = 64;
+//        int size3 = 16;
         MainServer mainServer = new MainServer();
 
-        generateFiles("t", size2);
+        Constants.BLOCK_SIZE = 512;
 
-        int numberOfAddresses = size3 + 1;
-        mainServer.runServer(new ArrayList<>(), new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses), true);
+        generateFiles("p", size);
+
+        Constants.BLOCK_SIZE = 65536;
+        int numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (size - 1);
+        mainServer.runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(), true);
+
+        Constants.BLOCK_SIZE = 262144;
+        mainServer.runServerAgain(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(), true);
+
+        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true);
 
 //        numberOfAddresses = size + 1;
 //        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(),
@@ -58,8 +66,8 @@ public class MainContinue {
 //        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(),
 //                Util.getAddressStrings(0, numberOfAddresses), true);
 
-        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
-                true);
+//        mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+//                true);
     }
 
     private static void generateFiles(String type, int size) {
