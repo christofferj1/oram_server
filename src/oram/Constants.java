@@ -17,7 +17,7 @@ public class Constants {
 
     public static final int POSITION_BLOCK_SIZE = 17;
 
-    public static final double BLOCKS_CREATED_AT_A_TIME = 500d;
+    public static final double BLOCKS_CREATED_AT_A_TIME = 100d;
 
     public static final String FILES_DIR = System.getProperty("user.dir") + "/files/";
 //    public static final String FILES_DIR = System.getProperty("user.home") + "/files/";

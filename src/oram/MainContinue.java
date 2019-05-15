@@ -19,20 +19,18 @@ public class MainContinue {
     private static final Logger logger = LogManager.getLogger("log");
 
     public static void main(String[] args) {
-        int size = 1024;
-//        int size2 = 64;
-//        int size3 = 16;
         MainServer mainServer = new MainServer();
 
-        Constants.BLOCK_SIZE = 512;
+//        Constants.BLOCK_SIZE = 512;
 
-        generateFiles("p", size);
+        generateFiles("p", 16);
 
-        Constants.BLOCK_SIZE = 65536;
-        int numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (size - 1);
+//        Constants.BLOCK_SIZE = 65536;
+        int numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (64 - 1);
         mainServer.runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(), true);
 
-        Constants.BLOCK_SIZE = 262144;
+//        Constants.BLOCK_SIZE = 262144;
+        numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (1024 - 1);
         mainServer.runServerAgain(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(), true);
 
         mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true);
