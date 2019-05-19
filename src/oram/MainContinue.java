@@ -23,15 +23,19 @@ public class MainContinue {
 
 //        Constants.BLOCK_SIZE = 512;
 
-        generateFiles("p", 16);
+        generateFiles("p", 64);
 
 //        Constants.BLOCK_SIZE = 65536;
-        int numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (64 - 1);
+        int numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (1024 - 1);
         mainServer.runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(), true);
 
 //        Constants.BLOCK_SIZE = 262144;
-        numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (1024 - 1);
-        mainServer.runServerAgain(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(), true);
+        numberOfAddresses = (int) (64 + 2 * Math.sqrt(64));
+        mainServer.runServerAgain(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), true);
+
+//        Constants.BLOCK_SIZE = 262144;
+        numberOfAddresses = (int) (1024 + 2 * Math.sqrt(1024));
+        mainServer.runServerAgain(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), true);
 
         mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true);
 
