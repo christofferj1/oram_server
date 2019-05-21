@@ -243,34 +243,38 @@ public class ServerCommunicationLayer {
     }
 
     private boolean generateFiles(List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
+        boolean res = Util.deleteFiles();
         int numberOfFiles;
         if (!lookAddresses.isEmpty()) {
             numberOfFiles = lookAddresses.size();
-            if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator())) {
+            if (new LookaheadBlockCreator().createBlocks(lookAddresses)) {
                 Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
-                return true;
+                res = true;
             } else {
                 Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Lookahead files");
-                return false;
-            }
-        } else if (!pathAddresses.isEmpty()) {
-            numberOfFiles = pathAddresses.size();
-            if (Util.createBlocks(numberOfFiles, new PathBlockCreator())) {
-                Util.logAndPrint(logger, "Created " + numberOfFiles + " Path files successfully");
-                return true;
-            } else {
-                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Path files");
-                return false;
-            }
-        } else {
-            numberOfFiles = trivAddresses.size();
-            if (Util.createBlocks(numberOfFiles, new TrivialBlockCreator())) {
-                Util.logAndPrint(logger, "Created " + numberOfFiles + " Trivial files successfully");
-                return true;
-            } else {
-                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Trivial files");
-                return false;
+                res = false;
             }
         }
+        if (res && !pathAddresses.isEmpty()) {
+            numberOfFiles = pathAddresses.size();
+            if (new PathBlockCreator().createBlocks(pathAddresses)) {
+                Util.logAndPrint(logger, "Created " + numberOfFiles + " Path files successfully");
+                res = true;
+            } else {
+                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Path files");
+                res = false;
+            }
+        }
+        if (res && !trivAddresses.isEmpty()) {
+            numberOfFiles = trivAddresses.size();
+            if (new TrivialBlockCreator().createBlocks(trivAddresses)) {
+                Util.logAndPrint(logger, "Created " + numberOfFiles + " Trivial files successfully");
+                res = true;
+            } else {
+                Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Trivial files");
+                res = false;
+            }
+        }
+        return res;
     }
 }

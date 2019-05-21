@@ -21,21 +21,19 @@ public class MainContinue {
     public static void main(String[] args) {
         MainServer mainServer = new MainServer();
 
-//        Constants.BLOCK_SIZE = 512;
+        Constants.BLOCK_SIZE = 262144;
 
-        generateFiles("p", 64);
+        generateFiles("l", 64);
 
-//        Constants.BLOCK_SIZE = 65536;
-        int numberOfAddresses = Constants.DEFAULT_BUCKET_SIZE * (1024 - 1);
+        Constants.BLOCK_SIZE = 262144;
+        int numberOfAddresses = (int) (1024 + 2 * Math.sqrt(1024));
         mainServer.runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(), true);
 
-//        Constants.BLOCK_SIZE = 262144;
-        numberOfAddresses = (int) (64 + 2 * Math.sqrt(64));
-        mainServer.runServerAgain(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), true);
+        Constants.BLOCK_SIZE = 65536;
+        mainServer.runServerAgain(Util.getAddressStrings(0,1088),  new ArrayList<>() , Util.getAddressStrings(1088, 1152), true);
 
-//        Constants.BLOCK_SIZE = 262144;
-        numberOfAddresses = (int) (1024 + 2 * Math.sqrt(1024));
-        mainServer.runServerAgain(new ArrayList<>(), Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), true);
+        Constants.BLOCK_SIZE = 65536;
+        mainServer.runServerAgain(Util.getAddressStrings(0,1088), new ArrayList<>(), Util.getAddressStrings(1088, 1153), true);
 
         mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true);
 
