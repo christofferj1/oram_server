@@ -21,19 +21,21 @@ public class MainContinue {
     public static void main(String[] args) {
         MainServer mainServer = new MainServer();
 
-        Constants.BLOCK_SIZE = 262144;
+        Constants.BLOCK_SIZE = 512;
 
-        generateFiles("l", 64);
+        generateFiles("t", 65);
 
-        Constants.BLOCK_SIZE = 262144;
+        Constants.BLOCK_SIZE = 65536;
         int numberOfAddresses = (int) (1024 + 2 * Math.sqrt(1024));
         mainServer.runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(), new ArrayList<>(), true);
 
         Constants.BLOCK_SIZE = 65536;
-        mainServer.runServerAgain(Util.getAddressStrings(0,1088),  new ArrayList<>() , Util.getAddressStrings(1088, 1152), true);
+        numberOfAddresses = (4 * 1024) - 1;
+        mainServer.runServerAgain(new ArrayList<>(),Util.getAddressStrings(0, numberOfAddresses),  Util.getAddressStrings(4092, 4157), true);
 
         Constants.BLOCK_SIZE = 65536;
-        mainServer.runServerAgain(Util.getAddressStrings(0,1088), new ArrayList<>(), Util.getAddressStrings(1088, 1153), true);
+        numberOfAddresses = (int) (1024 + 2 * Math.sqrt(1024));
+        mainServer.runServerAgain(Util.getAddressStrings(0,numberOfAddresses),  new ArrayList<>() , Util.getAddressStrings(1088, 1153), true);
 
         mainServer.runServerAgain(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true);
 

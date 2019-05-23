@@ -91,7 +91,7 @@ public class Util {
     }
 
     public static boolean createBlocks(int numberOfFiles, BlockCreator blockCreator) {
-        if (deleteFiles()) return false;
+        if (deleteFilesFailed()) return false;
 
         int from = 0;
         int to = numberOfFiles + from;
@@ -107,7 +107,7 @@ public class Util {
         return addresses;
     }
 
-    public static boolean deleteFiles() {
+    public static boolean deleteFilesFailed() {
         File filesDir = new File(Constants.FILES_DIR);
         String[] files = filesDir.list();
         if (files == null) {

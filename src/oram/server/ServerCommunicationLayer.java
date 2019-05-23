@@ -1,5 +1,6 @@
 package oram.server;
 
+import oram.Constants;
 import oram.OperationType;
 import oram.Util;
 import oram.block.BlockTrivial;
@@ -243,9 +244,9 @@ public class ServerCommunicationLayer {
     }
 
     private boolean generateFiles(List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
-        boolean res = Util.deleteFiles();
+        boolean res = !Util.deleteFilesFailed();
         int numberOfFiles;
-        if (!lookAddresses.isEmpty()) {
+        if (res && !lookAddresses.isEmpty()) {
             numberOfFiles = lookAddresses.size();
             if (new LookaheadBlockCreator().createBlocks(lookAddresses)) {
                 Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
@@ -267,6 +268,7 @@ public class ServerCommunicationLayer {
         }
         if (res && !trivAddresses.isEmpty()) {
             numberOfFiles = trivAddresses.size();
+            Constants.BLOCK_SIZE = 512; // TODO: This is clearly a hack
             if (new TrivialBlockCreator().createBlocks(trivAddresses)) {
                 Util.logAndPrint(logger, "Created " + numberOfFiles + " Trivial files successfully");
                 res = true;

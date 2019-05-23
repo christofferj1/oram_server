@@ -83,7 +83,7 @@ public class Main {
 
     private static void createFilesInLayers() {
         Util.logAndPrint(logger, "Delete files");
-        Util.deleteFiles();
+        Util.deleteFilesFailed();
 
         int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
         if (numberOfLayers > 5) {
