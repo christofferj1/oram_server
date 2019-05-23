@@ -22,7 +22,6 @@ public class MainContinue {
         MainServer mainServer = new MainServer();
 
         Constants.BLOCK_SIZE = 512;
-
         generateFiles("t", 65);
 
         Constants.BLOCK_SIZE = 65536;
@@ -32,6 +31,10 @@ public class MainContinue {
         Constants.BLOCK_SIZE = 65536;
         numberOfAddresses = (4 * 1024) - 1;
         mainServer.runServerAgain(new ArrayList<>(),Util.getAddressStrings(0, numberOfAddresses),  Util.getAddressStrings(4092, 4157), true);
+
+        Constants.BLOCK_SIZE = 65536;
+        numberOfAddresses = (int) (1024 + 2 * Math.sqrt(1024));
+        mainServer.runServerAgain(Util.getAddressStrings(0,numberOfAddresses),  new ArrayList<>() , Util.getAddressStrings(1088, 1153), true);
 
         Constants.BLOCK_SIZE = 65536;
         numberOfAddresses = (int) (1024 + 2 * Math.sqrt(1024));
