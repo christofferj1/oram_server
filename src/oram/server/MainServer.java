@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.*;
 import java.util.Enumeration;
-import java.util.List;
 
 /**
  * <p> ORAM <br>
@@ -18,7 +17,7 @@ import java.util.List;
 public class MainServer {
     private static final Logger logger = LogManager.getLogger("log");
 
-    public void runServer(List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
+    public void runServer() {
         logger.debug("######### INITIALIZED SERVER #########");
         logger.info("######### INITIALIZED SERVER #########");
 
@@ -31,7 +30,7 @@ public class MainServer {
         Socket socket = openSocket(serverSocket);
         if (socket == null) System.exit(-2);
 
-        new ServerCommunicationLayer(serverApplication).run(socket, lookAddresses, pathAddresses, trivAddresses);
+        new ServerCommunicationLayer(serverApplication).run(socket);
     }
 
     private ServerSocket openServerSocket() {

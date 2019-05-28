@@ -31,7 +31,7 @@ public class ServerCommunicationLayer {
         filesWritten = new HashSet<>();
     }
 
-    public void run(Socket socket, List<String> lookAddresses, List<String> pathAddresses, List<String> trivAddresses) {
+    public void run(Socket socket) {
         this.socket = socket;
 
         if (!initializeStreams())
@@ -67,8 +67,6 @@ public class ServerCommunicationLayer {
                     break;
                 }
                 case WRITE: { // Handle a write event
-//                    List<byte[]> dataArrays = accessEvent.getDataArrays();
-//                    boolean statusBit = application.write(addresses, dataArrays);
                     boolean statusBit = accessEvent.getDataArrays() != null;
                     boolean sendStatusBit = sendWritingStatusBit(statusBit);
 
@@ -80,11 +78,7 @@ public class ServerCommunicationLayer {
                     break;
                 }
                 case END: {
-                    ArrayList<String> fileWrittenList = new ArrayList<>(filesWritten);
-                    Collections.sort(fileWrittenList);
-
-                    if (sendWritingStatusBit(Util.recreateBlocks(fileWrittenList, lookAddresses, pathAddresses,
-                            trivAddresses)))
+                    if (sendWritingStatusBit(Util.deleteFiles()))
                         Util.logAndPrint(logger, "Successfully send writing status bit");
                     else
                         Util.logAndPrint(logger, "Failed to send writing status bit");

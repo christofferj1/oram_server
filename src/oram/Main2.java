@@ -17,83 +17,73 @@ import java.util.Scanner;
  * Master Thesis 2019 </p>
  */
 
-public class Main {
+public class Main2 {
     private static final Logger logger = LogManager.getLogger("log");
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Util.logAndPrint(logger, "Delete files");
+        Util.deleteFiles();
 
-        Util.logAndPrint(logger, "Create files or run server? [f/s]");
-        String answer = scanner.nextLine();
-        while (!(answer.equals("f") || answer.equals("s"))) {
-            Util.logAndPrint(logger, "Answer either 'f' or 's'");
-            answer = scanner.nextLine();
-        }
-
-        if (answer.equals("f")) {
-            generateFiles(scanner);
-        } else {
-            runServer(scanner);
-        }
-    }
-
-    private static void generateFiles(Scanner scanner) {
-        String answer = Util.getYesNoAnswer(scanner, "Create files in layers? [y/n]");
-        if (answer.equals("y")) {
-            createFilesInLayers();
+        int numberOfORAMS = Util.getInteger("number of layers of ORAMs (between 1 and 5, both included)");
+        if (numberOfORAMS > 5) {
+            Util.logAndPrint(logger, "Can't do more than 5 layers");
+            return;
+        } else if (numberOfORAMS < 1) {
+            Util.logAndPrint(logger, "Number og layers must be a positive number");
             return;
         }
 
-        Util.logAndPrint(logger, "How many files to create?");
-        answer = scanner.nextLine();
-        while (!answer.matches("\\d+")) {
-            Util.logAndPrint(logger, "Put in an integer");
-            answer = scanner.nextLine();
-        }
-        int numberOfFiles = Integer.parseInt(answer);
+        if (numberOfORAMS == 1)
+            if (!generateFiles())
+                return;
+
+        List<String> orams = createFilesInLayers(numberOfORAMS);
+        if (orams == null)
+            return;
+
+        new MainServer().runServer();
+    }
+
+    private static boolean generateFiles() {
+        Scanner scanner = new Scanner(System.in);
+
+        int numberOfFiles = Util.getInteger("number of blocks");
 
         Util.logAndPrint(logger, "Lookahead, Path or trivial blocks? [l/p/t]");
-        answer = scanner.nextLine();
+        String answer = scanner.nextLine();
         while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
             Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
             answer = scanner.nextLine();
         }
 
+        boolean res = false;
         switch (answer) {
             case "l":
-                if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator()))
+                if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator())) {
                     Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
-                else
+                    res = true;
+                } else
                     Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Lookahead files");
                 break;
             case "p":
-                if (Util.createBlocks(numberOfFiles, new PathBlockCreator()))
+                if (Util.createBlocks(numberOfFiles, new PathBlockCreator())) {
                     Util.logAndPrint(logger, "Created " + numberOfFiles + " Path files successfully");
-                else
+                    res = true;
+                } else
                     Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Path files");
                 break;
             default:
-                if (Util.createBlocks(numberOfFiles, new TrivialBlockCreator()))
+                if (Util.createBlocks(numberOfFiles, new TrivialBlockCreator())) {
                     Util.logAndPrint(logger, "Created " + numberOfFiles + " Trivial files successfully");
-                else
+                    res = true;
+                } else
                     Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Trivial files");
                 break;
         }
+        return res;
     }
 
-    private static void createFilesInLayers() {
-        Util.logAndPrint(logger, "Delete files");
-        Util.deleteFiles();
-
-        int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
-        if (numberOfLayers > 5) {
-            Util.logAndPrint(logger, "Can't do more than 5 layers");
-            return;
-        } else if (numberOfLayers < 1) {
-            Util.logAndPrint(logger, "Number og layers must be a positive number");
-            return;
-        }
-
+    private static List<String> createFilesInLayers(int numberOfORAMs) {
         String answer;
         Scanner scanner = new Scanner(System.in);
         int offset = 0;
@@ -104,15 +94,18 @@ public class Main {
         List<String> pathAddresses = new ArrayList<>();
         List<String> trivAddresses = new ArrayList<>();
 
+        List<String> res = new ArrayList<>();
+
         outer:
-        for (int i = 0; i < numberOfLayers; i++) {
-            Util.logAndPrint(logger, "Type of layer " + i + "? [l/lt/p/t]");
+        for (int i = 0; i < numberOfORAMs; i++) {
+            Util.logAndPrint(logger, "ORAM number " + i + ", choose between Lookahead, Path, Trivial, or Lookahead (using Trivial specialised for Lookahead) [l/lt/p/t]");
             answer = scanner.nextLine();
-            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t")|| answer.equals("lt"))) {
+            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t") || answer.equals("lt"))) {
                 Util.logAndPrint(logger, "Answer either 'l', 'lt', 'p', or 't'");
                 answer = scanner.nextLine();
             }
-            int levelSize = (int) Math.pow(2, (((numberOfLayers - 1) - i) * 4) + 6);
+            res.add(answer);
+            int levelSize = (int) Math.pow(2, (((numberOfORAMs - 1) - i) * 4) + 6);
             switch (answer) {
                 case "l":
                     newOffset = offset + levelSize + (int) (2 * Math.sqrt(levelSize));
@@ -140,27 +133,16 @@ public class Main {
                     break outer;
             }
         }
-        new LookaheadBlockCreator().createBlocks(lookAddresses);
-        new PathBlockCreator().createBlocks(pathAddresses);
-        new TrivialBlockCreator().createBlocks(trivAddresses);
+        boolean lookahead = new LookaheadBlockCreator().createBlocks(lookAddresses);
+        boolean path = new PathBlockCreator().createBlocks(pathAddresses);
+        boolean trivial = new TrivialBlockCreator().createBlocks(trivAddresses);
+
+        return lookahead && path && trivial ? res : null;
     }
 
-    private static void runServer(Scanner scanner) {
-        String answer = Util.getYesNoAnswer(scanner, "Run server in layers? [y/n]");
-        if (answer.equals("y")) {
-            runLayeredServer(scanner);
-            return;
-        }
-
-        Util.logAndPrint(logger, "Server with Lookahead or Trivial blocks? [l/p/t]");
-        answer = scanner.nextLine();
-        while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
-            Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
-            answer = scanner.nextLine();
-        }
-
+    private static void runServer(List<String> orams) {
         int numberOfAddresses = Util.getInteger("max number of addresses");
-//
+
 //        switch (answer) {
 //            case "l":
 //                new MainServer().runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(),
