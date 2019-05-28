@@ -78,7 +78,7 @@ public class ServerCommunicationLayer {
                     break;
                 }
                 case END: {
-                    if (sendWritingStatusBit(Util.deleteFiles()))
+                    if (!sendWritingStatusBit(Util.deleteFilesFails()))
                         Util.logAndPrint(logger, "Successfully send writing status bit");
                     else
                         Util.logAndPrint(logger, "Failed to send writing status bit");
@@ -98,6 +98,7 @@ public class ServerCommunicationLayer {
                     break outer;
             }
         }
+
         try {
             dataOutputStream.close();
             dataInputStream.close();

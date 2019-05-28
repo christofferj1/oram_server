@@ -22,7 +22,7 @@ public class Main2 {
 
     public static void main(String[] args) {
         Util.logAndPrint(logger, "Delete files");
-        Util.deleteFiles();
+        Util.deleteFilesFails();
 
         int numberOfORAMS = Util.getInteger("number of layers of ORAMs (between 1 and 5, both included)");
         if (numberOfORAMS > 5) {
@@ -145,79 +145,5 @@ public class Main2 {
         boolean trivial = new TrivialBlockCreator().createBlocks(trivAddresses);
 
         return lookahead && path && trivial ? res : null;
-    }
-
-    private static void runServer(List<String> orams) {
-        int numberOfAddresses = Util.getInteger("max number of addresses");
-
-//        switch (answer) {
-//            case "l":
-//                new MainServer().runServer(Util.getAddressStrings(0, numberOfAddresses), new ArrayList<>(),
-//                        new ArrayList<>());
-//            case "p":
-//                new MainServer().runServer(Util.getAddressStrings(0, numberOfAddresses),
-//                        new ArrayList<>());
-//            default:
-//                new MainServer().runServer(
-//                        Util.getAddressStrings(0, numberOfAddresses));
-//        }
-    }
-
-    private static void runLayeredServer(Scanner scanner) {
-        int numberOfLayers = Util.getInteger("How many layers of ORAM are going to be used?");
-        if (numberOfLayers > 5) {
-            Util.logAndPrint(logger, "Can't do more than 5 layers");
-            return;
-        } else if (numberOfLayers < 1) {
-            Util.logAndPrint(logger, "Number og layers must be a positive number");
-            return;
-        }
-
-        String answer;
-        int offset = 0;
-        int newOffset;
-        List<String> addresses;
-
-        List<String> lookAddresses = new ArrayList<>();
-        List<String> pathAddresses = new ArrayList<>();
-        List<String> trivAddresses = new ArrayList<>();
-
-        outer:
-        for (int i = 0; i < numberOfLayers; i++) {
-            Util.logAndPrint(logger, "Type of layer " + i + "? [l/lt/p/t]");
-            answer = scanner.nextLine();
-            while (!(answer.equals("l") || answer.equals("p") || answer.equals("t") || answer.equals("lt"))) {
-                Util.logAndPrint(logger, "Answer either 'l', 'lt', 'p', or 't'");
-                answer = scanner.nextLine();
-            }
-            int levelSize = (int) Math.pow(2, (((numberOfLayers - 1) - i) * 4) + 6);
-            switch (answer) {
-                case "l":
-                    newOffset = offset + levelSize + (int) (2 * Math.sqrt(levelSize));
-                    addresses = Util.getAddressStrings(offset, newOffset);
-                    offset = newOffset;
-                    lookAddresses.addAll(addresses);
-                    break;
-                case "lt":
-                    newOffset = offset + levelSize + (int) (2 * Math.sqrt(levelSize));
-                    newOffset += Math.ceil((double) levelSize / Constants.POSITION_BLOCK_SIZE);
-                    addresses = Util.getAddressStrings(offset, newOffset);
-
-                    lookAddresses.addAll(addresses);
-                    break outer;
-                case "p":
-                    newOffset = offset + (levelSize - 1) * Constants.DEFAULT_BUCKET_SIZE;
-                    addresses = Util.getAddressStrings(offset, newOffset);
-                    offset = newOffset;
-                    pathAddresses.addAll(addresses);
-                    break;
-                default:
-                    newOffset = offset + levelSize + 1;
-                    addresses = Util.getAddressStrings(offset, newOffset);
-                    trivAddresses.addAll(addresses);
-                    break outer;
-            }
-        }
-        new MainServer().runServer();
     }
 }
