@@ -33,23 +33,21 @@ public class Main2 {
             return;
         }
 
-        if (numberOfORAMS == 1)
+        if (numberOfORAMS == 1) {
             if (!generateFiles())
                 return;
-
-        List<String> orams = createFilesInLayers(numberOfORAMS);
-        if (orams == null)
-            return;
+        } else {
+            List<String> orams = createFilesInLayers(numberOfORAMS);
+            if (orams == null)
+                return;
+        }
 
         new MainServer().runServer();
     }
 
     private static boolean generateFiles() {
         Scanner scanner = new Scanner(System.in);
-
-        int numberOfFiles = Util.getInteger("number of blocks");
-
-        Util.logAndPrint(logger, "Lookahead, Path or trivial blocks? [l/p/t]");
+        Util.logAndPrint(logger, "Use Lookahead, Path, or Trivial blocks? [l/p/t]");
         String answer = scanner.nextLine();
         while (!(answer.equals("l") || answer.equals("p") || answer.equals("t"))) {
             Util.logAndPrint(logger, "Answer either 'l', 'p', or 't'");
@@ -58,21 +56,30 @@ public class Main2 {
 
         boolean res = false;
         switch (answer) {
-            case "l":
+            case "l": {
+                int oramSize = Util.getInteger("size, must be a square number");
+                int numberOfFiles = (int) (oramSize + 2 * Math.sqrt(oramSize));
                 if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator())) {
                     Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
                     res = true;
                 } else
                     Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Lookahead files");
                 break;
-            case "p":
+            }
+            case "p": {
+                int oramSize = Util.getInteger("size, must be a power of 2");
+                int bucketSize = Util.getInteger("bucket size");
+                int numberOfFiles = (oramSize * bucketSize) - 1;
                 if (Util.createBlocks(numberOfFiles, new PathBlockCreator())) {
                     Util.logAndPrint(logger, "Created " + numberOfFiles + " Path files successfully");
                     res = true;
                 } else
                     Util.logAndPrint(logger, "Unable to create " + numberOfFiles + " Path files");
                 break;
+            }
             default:
+                int oramSize = Util.getInteger("size");
+                int numberOfFiles = oramSize + 1;
                 if (Util.createBlocks(numberOfFiles, new TrivialBlockCreator())) {
                     Util.logAndPrint(logger, "Created " + numberOfFiles + " Trivial files successfully");
                     res = true;
