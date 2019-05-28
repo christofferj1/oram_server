@@ -1,7 +1,5 @@
 package oram.block;
 
-import oram.Util;
-
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -16,14 +14,6 @@ public class BlockPath {
     private byte[] data;
     private int index;
 
-    public BlockPath() {
-    }
-
-//    public BlockPath(int address, byte[] data) {
-//        this.address = address;
-//        this.data = data;
-//    }
-
     public BlockPath(int address, byte[] data, int index) {
         this.address = address;
         this.data = data;
@@ -34,24 +24,12 @@ public class BlockPath {
         return address;
     }
 
-    public void setAddress(int address) {
-        this.address = address;
-    }
-
     public byte[] getData() {
         return data;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
     public int getIndex() {
         return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 
     @Override
@@ -60,15 +38,6 @@ public class BlockPath {
                 "add=" + (address < 10 ? " " + address : address) +
                 ", data=" + Arrays.toString(data) +
                 ", index=" + index +
-                '}';
-    }
-
-    public String toStringShort() {
-        String dataString = Util.getShortDataString(data);
-        return "Lookahead{" +
-                "add=" + (address < 10 ? " " + address : address) +
-                ", (" + index + ")" +
-                ", data=" + dataString +
                 '}';
     }
 

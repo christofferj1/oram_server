@@ -22,34 +22,15 @@ public class BlockEncrypted implements Serializable {
         return address;
     }
 
-    public void setAddress(byte[] address) {
-        this.address = address;
-    }
-
     public byte[] getData() {
         return data;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
     @Override
     public String toString() {
-//        if (Util.isDummyAddress(Util.byteArrayToLeInt(address)))
-//            return "DUMMY COUNTER: " + Util.byteArrayToLeInt(data);
         return "BlockEncrypted{" +
                 "address=" + Arrays.toString(address) +
                 ", data=" + Arrays.toString(data) +
-                '}';
-    }
-
-    public String toStringShort() {
-        String dataString;
-        dataString = Util.getShortDataString(data);
-        return "Block{" +
-                "add=" + Arrays.toString(address) +
-                ", data=" + dataString +
                 '}';
     }
 

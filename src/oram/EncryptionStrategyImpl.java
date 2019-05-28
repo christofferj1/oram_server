@@ -47,7 +47,6 @@ public class EncryptionStrategyImpl {
             byte[] addAll = new byte[iv.length + cipherText.length];
             System.arraycopy(iv, 0, addAll, 0, iv.length);
             System.arraycopy(cipherText, 0, addAll, iv.length, cipherText.length);
-//            byte[] addAll = ArrayUtils.addAll(iv, cipherText);
             return addAll;
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                 BadPaddingException | InvalidAlgorithmParameterException e) {
@@ -56,24 +55,5 @@ public class EncryptionStrategyImpl {
             logger.debug("Stacktrace", e);
         }
         return null;
-    }
-
-    public byte[] decrypt(byte[] cipherText, SecretKey key) {
-        try {
-            byte[] iv = Arrays.copyOf(cipherText, Constants.AES_BLOCK_SIZE);
-            byte[] valueCipher = Arrays.copyOfRange(cipherText, Constants.AES_BLOCK_SIZE, cipherText.length);
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
-
-            return cipher.doFinal(valueCipher);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
-                BadPaddingException | InvalidAlgorithmParameterException e) {
-            logger.error("Error happened while decrypting");
-            logger.error(e);
-            logger.debug("Stacktrace", e);
-        }
-        return null;
-
     }
 }

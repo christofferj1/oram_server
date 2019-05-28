@@ -11,12 +11,12 @@ import java.util.Objects;
  * Master Thesis 2019 </p>
  */
 
-public class AccessEvent {
+class AccessEvent {
     private List<String> addresses;
     private List<byte[]> dataArrays;
     private OperationType operationType;
 
-    public AccessEvent(List<String> addresses, List<byte[]> dataArrays, OperationType operationType) {
+    AccessEvent(List<String> addresses, List<byte[]> dataArrays, OperationType operationType) {
         this.addresses = addresses;
         this.dataArrays = dataArrays;
         this.operationType = operationType;
@@ -26,24 +26,12 @@ public class AccessEvent {
         return addresses;
     }
 
-    public void setAddresses(List<String> addresses) {
-        this.addresses = addresses;
-    }
-
-    public List<byte[]> getDataArrays() {
+    List<byte[]> getDataArrays() {
         return dataArrays;
     }
 
-    public void setDataArrays(List<byte[]> dataArrays) {
-        this.dataArrays = dataArrays;
-    }
-
-    public OperationType getOperationType() {
+    OperationType getOperationType() {
         return operationType;
-    }
-
-    public void setOperationType(OperationType operationType) {
-        this.operationType = operationType;
     }
 
     @Override

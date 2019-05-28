@@ -18,7 +18,7 @@ import java.util.*;
  * Master Thesis 2019 </p>
  */
 
-public class ServerCommunicationLayer {
+class ServerCommunicationLayer {
     private final Logger logger = LogManager.getLogger("log");
     private Socket socket;
     private ServerApplication application;
@@ -26,12 +26,12 @@ public class ServerCommunicationLayer {
     private DataInputStream dataInputStream;
     private Set<String> filesWritten;
 
-    public ServerCommunicationLayer(ServerApplication application) {
+    ServerCommunicationLayer(ServerApplication application) {
         this.application = application;
         filesWritten = new HashSet<>();
     }
 
-    public void run(Socket socket) {
+    void run(Socket socket) {
         this.socket = socket;
 
         if (!initializeStreams())
@@ -78,7 +78,7 @@ public class ServerCommunicationLayer {
                     break;
                 }
                 case END: {
-                    if (!sendWritingStatusBit(Util.deleteFilesFails()))
+                    if (sendWritingStatusBit(!Util.deleteFilesFails()))
                         Util.logAndPrint(logger, "Successfully send writing status bit");
                     else
                         Util.logAndPrint(logger, "Failed to send writing status bit");
@@ -116,6 +116,7 @@ public class ServerCommunicationLayer {
         } catch (IOException e) {
             logger.error("Error happened while initializing streams: " + e);
             logger.debug("Stacktrace", e);
+            return false;
         }
         return true;
     }

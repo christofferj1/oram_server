@@ -48,7 +48,7 @@ public class TrivialBlockCreator implements BlockCreator {
                 System.arraycopy(address, 0, bytesToWrite, 0, address.length);
                 System.arraycopy(data, 0, bytesToWrite, address.length, data.length);
 
-                if (!Util.writeFile(bytesToWrite, currentAddresses.get(i))) {
+                if (Util.writeFileFailed(bytesToWrite, currentAddresses.get(i))) {
                     logger.error("Unable to write file: " + i);
                     return false;
                 }

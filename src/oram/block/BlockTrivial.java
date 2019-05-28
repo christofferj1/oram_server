@@ -14,28 +14,17 @@ public class BlockTrivial implements Serializable {
     private Integer address;
     private byte[] data;
 
-    public BlockTrivial() {
-    }
-
     public BlockTrivial(int address, byte[] data) {
         this.address = address;
         this.data = data;
     }
 
-    public int getAddress() {
+    private int getAddress() {
         return address;
-    }
-
-    public void setAddress(int address) {
-        this.address = address;
     }
 
     public byte[] getData() {
         return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 
     @Override
@@ -59,13 +48,6 @@ public class BlockTrivial implements Serializable {
     public String toString() {
         return "BlockTrivial{" +
                 "address=" + address +
-                ", data=" + Arrays.toString(data) +
-                '}';
-    }
-
-    public String toStringShort() {
-        return "Block{" +
-                "add=" + address +
                 ", data=" + Arrays.toString(data) +
                 '}';
     }

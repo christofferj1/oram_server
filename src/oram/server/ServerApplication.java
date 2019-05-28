@@ -10,7 +10,7 @@ import java.util.List;
  * Master Thesis 2019 </p>
  */
 
-public interface ServerApplication {
+interface ServerApplication {
     BlockTrivial read(String address);
 
     List<BlockTrivial> read(List<String> addresses);

@@ -27,7 +27,7 @@ import java.util.Scanner;
 public class Util {
     private static final Logger logger = LogManager.getLogger("log");
 
-    public static byte[] getRandomByteArray(int length) {
+    static byte[] getRandomByteArray(int length) {
         if (length <= 0) return new byte[0];
 
         SecureRandom random = new SecureRandom();
@@ -37,14 +37,12 @@ public class Util {
         return res;
     }
 
-    //        TODO: Needs testing. All numbers from 0 to like 100.
     public static int byteArrayToLeInt(byte[] b) {
         final ByteBuffer bb = ByteBuffer.wrap(b);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         return bb.getInt();
     }
 
-    //        TODO: Needs testing. All numbers from 0 to like 100.
     public static byte[] leIntToByteArray(int i) {
         final ByteBuffer bb = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
         bb.order(ByteOrder.LITTLE_ENDIAN);
@@ -52,7 +50,6 @@ public class Util {
         return bb.array();
     }
 
-    //        TODO: Needs testing. All numbers from 0 to like 100.
     public static byte[] beIntToByteArray(int i) {
         final ByteBuffer bb = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
         bb.order(ByteOrder.BIG_ENDIAN);
@@ -73,16 +70,16 @@ public class Util {
         return dataString;
     }
 
-    public static boolean writeFile(byte[] bytesForFile, String fileName) {
+    public static boolean writeFileFailed(byte[] bytesForFile, String fileName) {
         String filePath = Constants.FILES_DIR + fileName;
         try (FileOutputStream fos = new FileOutputStream(filePath)) {
             fos.write(bytesForFile);
         } catch (IOException e) {
             logger.error("Error happened while writing file: " + filePath + ", " + e);
             logger.debug("Stacktrace", e);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static void logAndPrint(Logger logger, String string) {
@@ -90,7 +87,7 @@ public class Util {
         logger.info(string);
     }
 
-    public static boolean createBlocks(int numberOfFiles, BlockCreator blockCreator) {
+    static boolean createBlocks(int numberOfFiles, BlockCreator blockCreator) {
         if (deleteFilesFails()) return false;
 
         int from = 0;
@@ -100,7 +97,7 @@ public class Util {
         return blockCreator.createBlocks(addresses);
     }
 
-    public static List<String> getAddressStrings(int from, int to) {
+    static List<String> getAddressStrings(int from, int to) {
         List<String> addresses = new ArrayList<>();
         for (int i = from; i < to; i++)
             addresses.add(String.valueOf(i));
@@ -131,19 +128,7 @@ public class Util {
         return false;
     }
 
-    public static String getYesNoAnswer(Scanner scanner, String string) {
-        logAndPrint(logger, string);
-        String answer = scanner.nextLine();
-        logger.info("a");
-        while (!(answer.equals("y") || answer.equals("n"))) {
-            logAndPrint(logger, "Provide a yes or no answer [y/n]");
-            answer = scanner.nextLine();
-            logger.info(answer);
-        }
-        return answer;
-    }
-
-    public static int getInteger(String name) {
+    static int getInteger(String name) {
         Scanner scanner = new Scanner(System.in);
         logAndPrint(logger, "Enter integer for '" + name + "'");
         String answer = scanner.nextLine();

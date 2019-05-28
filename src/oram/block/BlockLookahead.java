@@ -18,23 +18,9 @@ public class BlockLookahead {
     private int colIndex;
     private int rowIndex;
 
-    public BlockLookahead() {
-    }
-
     public BlockLookahead(int address, byte[] data) {
         this.address = address;
         this.data = data;
-    }
-
-    public BlockLookahead(int address, byte[] data, int rowIndex, int colIndex) {
-        this.address = address;
-        this.data = data;
-        this.colIndex = colIndex;
-        this.rowIndex = rowIndex;
-    }
-
-    public Index getIndex() {
-        return new Index(rowIndex, colIndex);
     }
 
     public void setIndex(Index index) {
@@ -46,33 +32,16 @@ public class BlockLookahead {
         return address;
     }
 
-    public void setAddress(int address) {
-        this.address = address;
-    }
-
-
     public byte[] getData() {
         return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 
     public int getColIndex() {
         return colIndex;
     }
 
-    public void setColIndex(int colIndex) {
-        this.colIndex = colIndex;
-    }
-
     public int getRowIndex() {
         return rowIndex;
-    }
-
-    public void setRowIndex(int rowIndex) {
-        this.rowIndex = rowIndex;
     }
 
     @Override

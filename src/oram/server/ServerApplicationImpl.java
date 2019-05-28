@@ -57,7 +57,7 @@ public class ServerApplicationImpl implements ServerApplication {
             return false;
         }
         for (int i = 0; i < addresses.size(); i++)
-            if (!Util.writeFile(dataArrays.get(i), addresses.get(i))) return false;
+            if (Util.writeFileFailed(dataArrays.get(i), addresses.get(i))) return false;
 
         return true;
     }

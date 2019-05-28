@@ -12,14 +12,14 @@ public class Constants {
     public static final byte[] KEY_BYTES = "$ Hello World! $".getBytes();
 
     public static final int BLOCK_SIZE = 512;
-    public static final int AES_KEY_SIZE = 16;
-    public static final int AES_BLOCK_SIZE = 16;
+    static final int AES_KEY_SIZE = 16;
+    static final int AES_BLOCK_SIZE = 16;
 
-    public static final int POSITION_BLOCK_SIZE = 16;
+    static final int POSITION_BLOCK_SIZE = 16;
 
-    public static final double BLOCKS_CREATED_AT_A_TIME = 1000d; // This reduce the max heap size when creating blocks
+    static final double BLOCKS_CREATED_AT_A_TIME = 1000d; // This reduce the max heap size when creating blocks
 
-    public static final String FILES_DIR = System.getProperty("user.dir") + "/files/";
+    static final String FILES_DIR = System.getProperty("user.dir") + "/files/";
 
-    public static final int DEFAULT_BUCKET_SIZE = 4;
+    static final int DEFAULT_BUCKET_SIZE = 4;
 }
