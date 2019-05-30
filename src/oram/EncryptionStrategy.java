@@ -18,7 +18,7 @@ import java.util.Arrays;
  * Master Thesis 2019 </p>
  */
 
-public class EncryptionStrategyImpl {
+public class EncryptionStrategy {
     private final Logger logger = LogManager.getLogger("log");
 
     public SecretKey generateSecretKey(byte[] randomBytes) {

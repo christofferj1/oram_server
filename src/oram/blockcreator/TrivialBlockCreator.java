@@ -2,7 +2,7 @@ package oram.blockcreator;
 
 import oram.BlockEncrypted;
 import oram.Constants;
-import oram.EncryptionStrategyImpl;
+import oram.EncryptionStrategy;
 import oram.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +35,7 @@ public class TrivialBlockCreator implements BlockCreator {
 
         for (int j = 0; j < addressLists.size(); j++) {
             List<String> currentAddresses = addressLists.get(j);
-            EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
+            EncryptionStrategy encryptionStrategy = new EncryptionStrategy();
             SecretKey secretKey = encryptionStrategy.generateSecretKey(Constants.KEY_BYTES);
             int numberOfFiles = currentAddresses.size();
             Util.logAndPrint(logger, "Overwriting " + numberOfFiles + " Trivial files, from: " + currentAddresses.get(0) + ", to: " + currentAddresses.get(currentAddresses.size() - 1) + ", part " + (j + 1) + "/" + addressLists.size());
@@ -63,7 +63,7 @@ public class TrivialBlockCreator implements BlockCreator {
         return true;
     }
 
-    private BlockEncrypted getEncryptedDummy(SecretKey key, EncryptionStrategyImpl encryptionStrategy) {
+    private BlockEncrypted getEncryptedDummy(SecretKey key, EncryptionStrategy encryptionStrategy) {
         byte[] encryptedAddress = encryptionStrategy.encrypt(Util.leIntToByteArray(0), key);
         byte[] encryptedData = encryptionStrategy.encrypt(new byte[Constants.BLOCK_SIZE], key);
         return new BlockEncrypted(encryptedAddress, encryptedData);

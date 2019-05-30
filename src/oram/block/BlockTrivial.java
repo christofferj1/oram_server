@@ -19,7 +19,7 @@ public class BlockTrivial implements Serializable {
         this.data = data;
     }
 
-    private int getAddress() {
+    public int getAddress() {
         return address;
     }
 

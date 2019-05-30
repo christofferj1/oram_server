@@ -2,14 +2,14 @@ package oram.blockcreator;
 
 import oram.BlockEncrypted;
 import oram.Constants;
-import oram.EncryptionStrategyImpl;
+import oram.EncryptionStrategy;
 import oram.Util;
 import oram.block.BlockLookahead;
+import oram.blockenc.BlockEncryptionStrategyLookahead;
 import oram.lookahead.Index;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +21,13 @@ import java.util.List;
 
 public class LookaheadBlockCreator implements BlockCreator {
     private static final Logger logger = LogManager.getLogger("log");
+    private EncryptionStrategy encryptionStrategy;
+    private BlockEncryptionStrategyLookahead blockEncStrategy;
+
+    public LookaheadBlockCreator(EncryptionStrategy encryptionStrategy) {
+        this.encryptionStrategy = encryptionStrategy;
+        this.blockEncStrategy = new BlockEncryptionStrategyLookahead(encryptionStrategy);
+    }
 
     @Override
     public boolean createBlocks(List<String> addresses) {
@@ -46,9 +53,10 @@ public class LookaheadBlockCreator implements BlockCreator {
 
             Util.logAndPrint(logger, "    " + numberOfFiles + " dummy blocks created");
 
-            EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
-            List<BlockEncrypted> encryptedList = encryptBlocks(blocks, encryptionStrategy,
+            List<BlockEncrypted> encryptedList = blockEncStrategy.encryptBlocks(blocks,
                     encryptionStrategy.generateSecretKey(Constants.KEY_BYTES));
+//            List<BlockEncrypted> encryptedList = encryptBlocks(blocks, encryptionStrategy,
+//                    encryptionStrategy.generateSecretKey(Constants.KEY_BYTES));
 
             if (encryptedList.isEmpty()) return false;
 
@@ -76,38 +84,38 @@ public class LookaheadBlockCreator implements BlockCreator {
         return true;
     }
 
-    private List<BlockEncrypted> encryptBlocks(List<BlockLookahead> blockLookaheads,
-                                               EncryptionStrategyImpl encryptionStrategy, SecretKey secretKey) {
-        List<BlockEncrypted> res = new ArrayList<>();
-        for (BlockLookahead block : blockLookaheads) {
-            if (block == null) {
-                res.add(null);
-                continue;
-            }
-            byte[] rowIndexBytes = Util.leIntToByteArray(block.getRowIndex());
-            byte[] colIndexBytes = Util.leIntToByteArray(block.getColIndex());
-            byte[] addressBytes = Util.leIntToByteArray(block.getAddress());
-            byte[] encryptedAddress = encryptionStrategy.encrypt(addressBytes, secretKey);
-            byte[] encryptedData = encryptionStrategy.encrypt(block.getData(), secretKey);
-
-            byte[] indexBytes = new byte[rowIndexBytes.length + colIndexBytes.length];
-            System.arraycopy(rowIndexBytes, 0, indexBytes, 0, rowIndexBytes.length);
-            System.arraycopy(colIndexBytes, 0, indexBytes, rowIndexBytes.length, colIndexBytes.length);
-            byte[] encryptedIndex = encryptionStrategy.encrypt(indexBytes, secretKey);
-
-            if (encryptedAddress == null || encryptedData == null || encryptedIndex == null) {
-                logger.error("Unable to encrypt block: " + block.toStringShort());
-                return new ArrayList<>();
-            }
-
-            byte[] encryptedDataPlus = new byte[encryptedData.length + encryptedIndex.length];
-            System.arraycopy(encryptedData, 0, encryptedDataPlus, 0, encryptedData.length);
-            System.arraycopy(encryptedIndex, 0, encryptedDataPlus, encryptedData.length, encryptedIndex.length);
-
-            res.add(new BlockEncrypted(encryptedAddress, encryptedDataPlus));
-        }
-        return res;
-    }
+//    private List<BlockEncrypted> encryptBlocks(List<BlockLookahead> blockLookaheads,
+//                                               EncryptionStrategy encryptionStrategy, SecretKey secretKey) {
+//        List<BlockEncrypted> res = new ArrayList<>();
+//        for (BlockLookahead block : blockLookaheads) {
+//            if (block == null) {
+//                res.add(null);
+//                continue;
+//            }
+//            byte[] rowIndexBytes = Util.leIntToByteArray(block.getRowIndex());
+//            byte[] colIndexBytes = Util.leIntToByteArray(block.getColIndex());
+//            byte[] addressBytes = Util.leIntToByteArray(block.getAddress());
+//            byte[] encryptedAddress = encryptionStrategy.encrypt(addressBytes, secretKey);
+//            byte[] encryptedData = encryptionStrategy.encrypt(block.getData(), secretKey);
+//
+//            byte[] indexBytes = new byte[rowIndexBytes.length + colIndexBytes.length];
+//            System.arraycopy(rowIndexBytes, 0, indexBytes, 0, rowIndexBytes.length);
+//            System.arraycopy(colIndexBytes, 0, indexBytes, rowIndexBytes.length, colIndexBytes.length);
+//            byte[] encryptedIndex = encryptionStrategy.encrypt(indexBytes, secretKey);
+//
+//            if (encryptedAddress == null || encryptedData == null || encryptedIndex == null) {
+//                logger.error("Unable to encrypt block: " + block.toStringShort());
+//                return new ArrayList<>();
+//            }
+//
+//            byte[] encryptedDataPlus = new byte[encryptedData.length + encryptedIndex.length];
+//            System.arraycopy(encryptedData, 0, encryptedDataPlus, 0, encryptedData.length);
+//            System.arraycopy(encryptedIndex, 0, encryptedDataPlus, encryptedData.length, encryptedIndex.length);
+//
+//            res.add(new BlockEncrypted(encryptedAddress, encryptedDataPlus));
+//        }
+//        return res;
+//    }
 
     private BlockLookahead getLookaheadDummyBlock() {
         BlockLookahead blockLookahead = new BlockLookahead(0, new byte[Constants.BLOCK_SIZE]);

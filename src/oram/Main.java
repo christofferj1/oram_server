@@ -59,7 +59,7 @@ class Main {
             case "l": {
                 int oramSize = Util.getInteger("size, must be a square number");
                 int numberOfFiles = (int) (oramSize + 2 * Math.sqrt(oramSize));
-                if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator())) {
+                if (Util.createBlocks(numberOfFiles, new LookaheadBlockCreator(new EncryptionStrategy()))) {
                     Util.logAndPrint(logger, "Created " + numberOfFiles + " Lookahead files successfully");
                     res = true;
                 } else
@@ -70,7 +70,7 @@ class Main {
                 int oramSize = Util.getInteger("size, must be a power of 2");
                 int bucketSize = Util.getInteger("bucket size");
                 int numberOfFiles = (oramSize * bucketSize) - 1;
-                if (Util.createBlocks(numberOfFiles, new PathBlockCreator())) {
+                if (Util.createBlocks(numberOfFiles, new PathBlockCreator(new EncryptionStrategy()))) {
                     Util.logAndPrint(logger, "Created " + numberOfFiles + " Path files successfully");
                     res = true;
                 } else
@@ -140,8 +140,8 @@ class Main {
                     break outer;
             }
         }
-        boolean lookahead = new LookaheadBlockCreator().createBlocks(lookAddresses);
-        boolean path = new PathBlockCreator().createBlocks(pathAddresses);
+        boolean lookahead = new LookaheadBlockCreator(new EncryptionStrategy()).createBlocks(lookAddresses);
+        boolean path = new PathBlockCreator(new EncryptionStrategy()).createBlocks(pathAddresses);
         boolean trivial = new TrivialBlockCreator().createBlocks(trivAddresses);
 
         return lookahead && path && trivial ? res : null;

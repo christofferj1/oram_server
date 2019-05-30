@@ -2,13 +2,13 @@ package oram.blockcreator;
 
 import oram.BlockEncrypted;
 import oram.Constants;
-import oram.EncryptionStrategyImpl;
+import oram.EncryptionStrategy;
 import oram.Util;
 import oram.block.BlockPath;
+import oram.blockenc.BlockEncryptionStrategyPath;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +20,11 @@ import java.util.List;
 
 public class PathBlockCreator implements BlockCreator {
     private static final Logger logger = LogManager.getLogger("log");
+    private BlockEncryptionStrategyPath blockEncStrategy;
+
+    public PathBlockCreator(EncryptionStrategy encryptionStrategy) {
+        blockEncStrategy = new BlockEncryptionStrategyPath(encryptionStrategy);
+    }
 
     @Override
     public boolean createBlocks(List<String> addresses) {
@@ -45,8 +50,8 @@ public class PathBlockCreator implements BlockCreator {
 
             Util.logAndPrint(logger, "    " + numberOfFiles + " dummy blocks created");
 
-            EncryptionStrategyImpl encryptionStrategy = new EncryptionStrategyImpl();
-            List<BlockEncrypted> encryptedList = encryptBlocks(blocks, encryptionStrategy,
+            EncryptionStrategy encryptionStrategy = new EncryptionStrategy();
+            List<BlockEncrypted> encryptedList = blockEncStrategy.encryptBlocks(blocks,
                     encryptionStrategy.generateSecretKey(Constants.KEY_BYTES));
 
             if (encryptedList.isEmpty()) return false;
@@ -74,32 +79,6 @@ public class PathBlockCreator implements BlockCreator {
 
         return true;
 
-    }
-
-    private List<BlockEncrypted> encryptBlocks(List<BlockPath> blockPaths, EncryptionStrategyImpl encryptionStrategy,
-                                               SecretKey secretKey) {
-        List<BlockEncrypted> res = new ArrayList<>();
-        for (BlockPath block : blockPaths) {
-            if (block == null) {
-                res.add(null);
-                continue;
-            }
-
-            byte[] addressCipher = encryptionStrategy.encrypt(Util.leIntToByteArray(block.getAddress()), secretKey);
-            byte[] indexCipher = encryptionStrategy.encrypt(Util.leIntToByteArray(block.getIndex()), secretKey);
-            byte[] dataCipher = encryptionStrategy.encrypt(block.getData(), secretKey);
-            if (addressCipher == null || indexCipher == null || dataCipher == null) {
-                logger.error("Unable to encrypt address: " + block.getAddress() + " or data");
-                return new ArrayList<>();
-            }
-
-            byte[] encryptedDataPlus = new byte[indexCipher.length + dataCipher.length];
-            System.arraycopy(dataCipher, 0, encryptedDataPlus, 0, dataCipher.length);
-            System.arraycopy(indexCipher, 0, encryptedDataPlus, dataCipher.length, indexCipher.length);
-
-            res.add(new BlockEncrypted(addressCipher, encryptedDataPlus));
-        }
-        return res;
     }
 
     private BlockPath getPathDummyBlock() {

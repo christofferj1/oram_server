@@ -12,9 +12,8 @@ public class Constants {
     public static final byte[] KEY_BYTES = "$ Hello World! $".getBytes();
 
     public static final int BLOCK_SIZE = 512;
+    public static final int AES_BLOCK_SIZE = 16;
     static final int AES_KEY_SIZE = 16;
-    static final int AES_BLOCK_SIZE = 16;
-
     static final int POSITION_BLOCK_SIZE = 16;
 
     static final double BLOCKS_CREATED_AT_A_TIME = 1000d; // This reduce the max heap size when creating blocks

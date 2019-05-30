@@ -149,7 +149,7 @@ public class Util {
                 if (filesToWrite.contains(string)) {filesToWrite.remove(string);} else {lookAddresses.remove(i);}
             }
 
-            boolean res = new LookaheadBlockCreator().createBlocks(lookAddresses);
+            boolean res = new LookaheadBlockCreator(new EncryptionStrategy()).createBlocks(lookAddresses);
             if (!res) return false;
         }
 
@@ -162,7 +162,7 @@ public class Util {
                     pathAddresses.remove(i);
             }
 
-            boolean res = new PathBlockCreator().createBlocks(pathAddresses);
+            boolean res = new PathBlockCreator(new EncryptionStrategy()).createBlocks(pathAddresses);
             if (!res) return false;
         }
 
