@@ -187,4 +187,15 @@ public class Util {
         }
         return addressLists;
     }
+
+    public static boolean makeSureFilesFolderExists() {
+        String path = System.getProperty("user.dir") + "/files";
+
+        boolean res = true;
+        File directory = new File(path);
+        if (!directory.exists())
+           res = directory.mkdir();
+
+        return res;
+    }
 }

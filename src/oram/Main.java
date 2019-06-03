@@ -21,6 +21,11 @@ class Main {
     private static final Logger logger = LogManager.getLogger("log");
 
     public static void main(String[] args) {
+        if (!Util.makeSureFilesFolderExists()) {
+            Util.logAndPrint(logger, "Unable to make sure folder for file exists");
+            System.exit(-1);
+        }
+
         Util.logAndPrint(logger, "Delete files");
         Util.deleteFilesFails();
 
