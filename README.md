@@ -15,4 +15,4 @@ This software sets up the server environment, by creating the dummy blocks neede
 1. choose how many layers of ORAM you want to run.
 2. choose which kind of ORAM you would like to run, Lookahead ORAM, Path ORAM or Trivial ORAM. If you have chosen to run multiple layers of recursive ORAM, you must choose an ORAM for each layer, starting with the biggest. If you choose either Trivial or the specialized Lookahead ORAM, no more layers need to be chosen, as the ORAMs don't need further layers for the position map. ([l/lt/p/t] means you should write e.g. 'l' and hit enter.)
 
-It then creates the blocks needed. At last it prints the local IP address, which can be used to connect to the server, if both server and client runs on the same network.
+It then creates the blocks needed, and are ready to connect to a client. The client needs the IP-address of the server, the port is hard coded to 59595.

@@ -23,7 +23,7 @@ public class MainServer {
 
         ServerApplication serverApplication = new ServerApplicationImpl();
 
-        System.out.println(getIPAddress());
+//        System.out.println(getIPAddress());
 
         ServerSocket serverSocket = openServerSocket();
         if (serverSocket == null) System.exit(-1);
