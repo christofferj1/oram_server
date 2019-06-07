@@ -110,7 +110,7 @@ class Main {
 
         outer:
         for (int i = 0; i < numberOfORAMs; i++) {
-            Util.logAndPrint(logger, "ORAM number " + i + ", choose between Lookahead, Path, Trivial, or Lookahead (using Trivial specialised for Lookahead) [l/lt/p/t]");
+            Util.logAndPrint(logger, "ORAM number " + i + ", choose between Lookahead, Lookahead using Trivial specialised for Lookahead, Path, or Trivial [l/lt/p/t]");
             answer = scanner.nextLine();
             while (!(answer.equals("l") || answer.equals("p") || answer.equals("t") || answer.equals("lt"))) {
                 Util.logAndPrint(logger, "Answer either 'l', 'lt', 'p', or 't'");
